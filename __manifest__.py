@@ -7,6 +7,10 @@
     "company": "Strats360 Technolabs-LLP",
     "maintainer": "Strats360 Technolabs-LLP",
     "website": "https://strats360.com/",
+    # Shown on the Apps Store listing as the contact for buyers. Odoo's
+    # vendor guidelines require a monitored address here; a listing with
+    # no support key is a standard review rejection.
+    "support": "nirav@wewant360.com",
     'description': """
 BlueNova Backend Theme
 ======================
@@ -42,7 +46,12 @@ Key Features:
 Uninstall the module to instantly return to the default Odoo look.
 No data is modified.
     """,
-    'license': 'LGPL-3',
+    # OPL-1, not LGPL-3: this is sold on the Odoo Apps Store, and Odoo
+    # requires paid modules to carry the Odoo Proprietary License v1.0.
+    # The bundled Inter and Poppins webfonts stay under the SIL Open Font
+    # License 1.1, which permits redistribution inside a proprietary
+    # work — see static/src/fonts/OFL.txt.
+    'license': 'OPL-1',
     'depends': [
         'web',
         'base_setup',
