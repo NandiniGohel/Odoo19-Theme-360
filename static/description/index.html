@@ -1,222 +1,1072 @@
-<section class="oe_container">
-    <div class="oe_row oe_spaced">
-        <img src="banner.png" class="oe_picture oe_screenshot" style="width:100%;border-radius:12px;" alt="BlueNova Backend Theme" />
-    </div>
-</section>
+<!--
+    BlueNova Backend Theme — module description page.
 
-<section class="oe_container">
-    <div class="oe_row oe_spaced">
-        <h2 class="oe_slogan" style="color:#3959b0;">BlueNova Backend Theme</h2>
-        <h3 class="oe_slogan">A premium visual reskin of the Odoo 19 backend.</h3>
-        <p class="oe_mt32 text-center">
-            Persistent app sidebar, light/dark mode, a themed login / signup / reset-password
-            flow, an optional public home page, a KPI landing dashboard, and an in-app
-            Settings screen for recolouring everything — no SCSS edits, no asset rebuild.
+    Self-contained on purpose: no CDN font, no external stylesheet, no
+    script. The Odoo Apps page renders this fragment inside its own
+    document, and an external request here would be the one thing the
+    theme itself refuses to make (see fonts.scss — the webfonts are
+    bundled precisely so the backend works offline and under a strict
+    CSP).
+
+    Every claim below is checked against the source tree. Where a
+    capability is narrower than its name suggests — the calendar is
+    styling, not a view; the chat needs Discuss; the CRM banner is not
+    loaded — that is stated rather than omitted.
+-->
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>BlueNova Backend Theme | Odoo 19 Community Backend Theme</title>
+<meta name="description" content="A modern Odoo 19 Community backend theme: persistent app sidebar, instant light/dark mode, a KPI landing dashboard with a Discuss chat panel, card-based UI, themed login pages, and a Settings screen that recolours the whole web client with no asset rebuild."/>
+<meta name="author" content="Strats360 Technolabs-LLP"/>
+<meta property="og:type" content="product"/>
+<meta property="og:title" content="BlueNova Backend Theme | Odoo 19 Community Backend Theme"/>
+<meta property="og:description" content="Persistent app sidebar, instant light/dark mode, a KPI landing dashboard with a Discuss chat panel, card-based UI, and a live theme-colour Settings screen — for Odoo 19 Community."/>
+<meta property="og:image" content="banner.png"/>
+
+<style>
+/* ── Tokens ──────────────────────────────────────────────────────
+   Namespaced under .bn-page so nothing here can leak into the Odoo
+   Apps chrome this fragment is rendered inside. */
+.bn-page {
+    --bn-ink:        #111827;
+    --bn-ink-soft:   #4b5563;
+    --bn-ink-faint:  #6b7280;
+    --bn-bg:         #f8f9fa;
+    --bn-surface:    #ffffff;
+    --bn-border:     #e5e7eb;
+    --bn-primary:    #3959b0;
+    --bn-primary-dk: #1e3a8a;
+    --bn-accent:     #0284c7;
+    --bn-night:      #0b1120;
+    --bn-night-2:    #131c31;
+    --bn-night-ink:  #e2e8f0;
+    --bn-night-sub:  #94a3b8;
+    --bn-radius:     14px;
+    --bn-shadow:     0 1px 2px rgba(17,24,39,.04), 0 8px 24px rgba(17,24,39,.06);
+
+    box-sizing: border-box;
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 20px 64px;
+    color: var(--bn-ink);
+    background: var(--bn-surface);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                 "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+}
+.bn-page *, .bn-page *::before, .bn-page *::after { box-sizing: inherit; }
+.bn-page img { max-width: 100%; height: auto; display: block; }
+/* ── A specificity note that governs every rule below ──────────
+   These base rules are `.bn-page` plus an element name — a class AND
+   an element, so 0,1,1. A bare single-class component rule is 0,1,0
+   and LOSES to them. That is not a theoretical problem: it silently
+   ate `margin: 0 auto` on the two centred hero paragraphs, so their
+   max-width boxes sat flush-left while their text centred inside
+   them — the whole hero looked mis-centred against the badge, the
+   title and the buttons, which have no competing base rule.
+   Every component rule that styles a p / ul / li / a is therefore
+   written `.bn-page .bn-thing` (0,2,0). Keep it that way. */
+.bn-page p  { margin: 0 0 14px; }
+.bn-page ul { margin: 0; padding-left: 20px; }
+.bn-page li { margin-bottom: 8px; }
+.bn-page a  { color: var(--bn-primary); text-decoration: none; }
+.bn-page a:hover { text-decoration: underline; }
+.bn-page code {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: .875em;
+    background: var(--bn-bg);
+    border: 1px solid var(--bn-border);
+    border-radius: 5px;
+    padding: 1px 5px;
+    white-space: nowrap;
+}
+
+/* ── Section rhythm ─────────────────────────────────────────── */
+.bn-sec { padding: 56px 0; border-top: 1px solid var(--bn-border); }
+.bn-sec:first-of-type { border-top: 0; }
+.bn-page .bn-eyebrow {
+    margin: 0 0 10px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--bn-accent);
+}
+.bn-h2 {
+    margin: 0 0 12px;
+    font-size: 30px;
+    line-height: 1.25;
+    font-weight: 700;
+    letter-spacing: -.018em;
+    color: var(--bn-ink);
+    /* Evens out a two-line heading instead of leaving one word
+       stranded on line two. Ignored where unsupported. */
+    text-wrap: balance;
+}
+.bn-page .bn-lead {
+    margin: 0 0 32px;
+    /* ch, not px: the measure that matters is characters per line, and
+       these leads sit at a different font-size from the body. ~72ch is
+       the readable band, and it lands close to the 760px this used to
+       hardcode. */
+    max-width: 72ch;
+    font-size: 16.5px;
+    color: var(--bn-ink-soft);
+    text-wrap: pretty;
+}
+
+/* ── Hero ───────────────────────────────────────────────────── */
+.bn-hero {
+    margin: 0 -20px 0;
+    padding: 60px 40px 56px;
+    background: linear-gradient(135deg, var(--bn-primary-dk) 0%, var(--bn-primary) 55%, var(--bn-accent) 100%);
+    color: #fff;
+    text-align: center;
+}
+.bn-hero__badge {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 5px 14px;
+    border: 1px solid rgba(255,255,255,.32);
+    border-radius: 999px;
+    background: rgba(255,255,255,.12);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+.bn-hero__title {
+    margin: 0 0 12px;
+    font-size: 46px;
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: -.03em;
+    text-wrap: balance;
+}
+/* Both of these are paragraphs, so both need the .bn-page prefix or
+   `.bn-page p`'s `margin: 0 0 14px` overrides the `auto` and the
+   centring silently fails — see the note by the base rules. */
+.bn-page .bn-hero__sub {
+    text-align: center;
+    margin: 0 auto 18px;
+    max-width: 46ch;
+    font-size: 19px;
+    font-weight: 500;
+    line-height: 1.45;
+    color: rgba(255,255,255,.92);
+    text-wrap: balance;
+}
+.bn-page .bn-hero__text {
+    text-align: center;
+    margin: 0 auto 30px;
+    /* The old 700px ran to ~90 characters. Centred text needs a
+       shorter measure than left-aligned text before the rag stops
+       reading as lopsided — 70ch is the usual upper bound, and it
+       costs roughly one extra line for a much evener block. */
+    max-width: 70ch;
+    font-size: 15.5px;
+    line-height: 1.7;
+    color: rgba(255,255,255,.84);
+    text-wrap: pretty;
+}
+.bn-cta { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+/* Every button rule is written `.bn-page .bn-btn…` (0,2,0) rather than
+   `.bn-btn…` (0,1,0) on purpose. The generic link rule above is
+   `.bn-page a` — a class *and* an element, so 0,1,1 — and it would
+   otherwise outrank a bare single-class rule and paint every CTA
+   --bn-primary. On the blue hero that is dark indigo on translucent
+   white: the two ghost buttons come out effectively invisible, and the
+   solid one only looks right by coincidence, because the colour it was
+   losing to happens to be near the one it wanted. */
+.bn-page .bn-btn {
+    display: inline-block;
+    padding: 11px 24px;
+    border-radius: 10px;
+    font-size: 14.5px;
+    font-weight: 600;
+    line-height: 1.4;
+    border: 1px solid transparent;
+    text-decoration: none;
+    transition: background-color .15s ease, border-color .15s ease;
+}
+.bn-page .bn-btn--solid {
+    background: #fff;
+    color: var(--bn-primary-dk);
+    border-color: #fff;
+}
+.bn-page .bn-btn--ghost {
+    background: rgba(255,255,255,.14);
+    color: #fff;
+    border-color: rgba(255,255,255,.55);
+}
+.bn-page .bn-btn:hover { text-decoration: none; }
+.bn-page .bn-btn--solid:hover { background: #eef2ff; border-color: #eef2ff; }
+.bn-page .bn-btn--ghost:hover { background: rgba(255,255,255,.26); border-color: #fff; }
+.bn-hero__banner {
+    margin: 40px auto 0;
+    max-width: 940px;
+    border-radius: var(--bn-radius);
+    overflow: hidden;
+    box-shadow: 0 18px 48px rgba(11,17,32,.32);
+}
+
+/* ── Cards ──────────────────────────────────────────────────── */
+.bn-grid { display: grid; gap: 18px; }
+.bn-grid--3 { grid-template-columns: repeat(3, 1fr); }
+.bn-grid--2 { grid-template-columns: repeat(2, 1fr); }
+.bn-card {
+    padding: 24px;
+    background: var(--bn-surface);
+    border: 1px solid var(--bn-border);
+    border-radius: var(--bn-radius);
+    box-shadow: var(--bn-shadow);
+}
+.bn-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px; height: 42px;
+    margin-bottom: 14px;
+    border-radius: 11px;
+    background: rgba(57,89,176,.09);
+    color: var(--bn-primary);
+    font-size: 20px;
+    line-height: 1;
+}
+.bn-card__title {
+    margin: 0 0 7px;
+    font-size: 16.5px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+}
+/* .bn-page prefix again: a bare `.bn-card__text { margin: 0 }` loses to
+   `.bn-page p` and every card picks up 14px of dead space under its
+   last line. */
+.bn-page .bn-card__text {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--bn-ink-soft);
+    text-wrap: pretty;
+}
+
+/* ── Split feature rows ─────────────────────────────────────── */
+.bn-split { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+.bn-panel {
+    padding: 24px;
+    background: var(--bn-bg);
+    border: 1px solid var(--bn-border);
+    border-radius: var(--bn-radius);
+}
+.bn-panel h4 {
+    margin: 0 0 10px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    color: var(--bn-ink);
+}
+.bn-panel ul { padding-left: 18px; font-size: 14.5px; color: var(--bn-ink-soft); }
+
+/* ── Note / caveat callout ──────────────────────────────────── */
+.bn-note {
+    margin-top: 20px;
+    padding: 14px 18px;
+    border-left: 3px solid var(--bn-accent);
+    border-radius: 0 9px 9px 0;
+    background: rgba(2,132,199,.06);
+    font-size: 14px;
+    color: var(--bn-ink-soft);
+}
+.bn-note strong { color: var(--bn-ink); }
+
+/* ── Dark band ──────────────────────────────────────────────── */
+.bn-dark {
+    margin: 0 -20px;
+    padding: 56px 40px;
+    background: var(--bn-night);
+    color: var(--bn-night-ink);
+    border-top: 0;
+}
+.bn-dark .bn-h2 { color: #f8fafc; }
+.bn-dark .bn-lead, .bn-dark .bn-card__text { color: var(--bn-night-sub); }
+.bn-dark .bn-card {
+    background: var(--bn-night-2);
+    border-color: #243149;
+    box-shadow: none;
+}
+.bn-dark .bn-card__title { color: #f8fafc; }
+.bn-dark .bn-card__icon { background: rgba(124,154,255,.14); color: #7c9aff; }
+.bn-dark code { background: #0f1728; border-color: #243149; color: var(--bn-night-ink); }
+.bn-dark .bn-eyebrow { color: #38bdf8; }
+
+/* ── Swatches ───────────────────────────────────────────────── */
+.bn-swatches { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 6px; }
+.bn-swatch { display: flex; align-items: center; gap: 9px; font-size: 14px; color: var(--bn-ink-soft); }
+.bn-swatch i {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    border: 1px solid rgba(17,24,39,.12);
+}
+
+/* ── Spec table ─────────────────────────────────────────────── */
+.bn-table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.bn-table th, .bn-table td {
+    padding: 11px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--bn-border);
+    vertical-align: top;
+}
+.bn-table th { width: 34%; font-weight: 600; color: var(--bn-ink); }
+.bn-table td { color: var(--bn-ink-soft); }
+.bn-table tr:last-child th, .bn-table tr:last-child td { border-bottom: 0; }
+
+/* ── Steps ──────────────────────────────────────────────────── */
+.bn-steps { counter-reset: bn; list-style: none; padding: 0; margin: 0; }
+.bn-steps li {
+    counter-increment: bn;
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 13px;
+    font-size: 14.5px;
+    color: var(--bn-ink-soft);
+}
+.bn-steps li::before {
+    content: counter(bn);
+    position: absolute;
+    left: 0; top: 0;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--bn-primary);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 26px;
+    text-align: center;
+}
+
+/* ── Footer ─────────────────────────────────────────────────── */
+.bn-foot {
+    padding: 40px 0 0;
+    border-top: 1px solid var(--bn-border);
+    text-align: center;
+    font-size: 14px;
+    color: var(--bn-ink-faint);
+}
+.bn-foot__name { font-size: 17px; font-weight: 700; color: var(--bn-ink); margin-bottom: 4px; }
+.bn-foot__links { margin: 16px 0 20px; }
+.bn-foot__links a { margin: 0 10px; }
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .bn-grid--3 { grid-template-columns: repeat(2, 1fr); }
+    .bn-split   { grid-template-columns: 1fr; gap: 18px; }
+    .bn-hero__title { font-size: 36px; }
+    .bn-hero { padding: 48px 24px 44px; }
+    .bn-dark { padding: 48px 24px; }
+}
+@media (max-width: 600px) {
+    .bn-grid--3, .bn-grid--2 { grid-template-columns: 1fr; }
+    .bn-hero__title { font-size: 29px; }
+    /* .bn-page prefix required here too. A media query adds no
+       specificity, so a bare `.bn-hero__sub` (0,1,0) loses to the
+       `.bn-page .bn-hero__sub` (0,2,0) rule above and this override
+       would silently never apply. */
+    .bn-page .bn-hero__sub  { font-size: 16.5px; }
+    .bn-page .bn-hero__text { font-size: 15px; line-height: 1.6; }
+    .bn-h2 { font-size: 24px; }
+    .bn-sec { padding: 40px 0; }
+    .bn-table th { width: 42%; }
+}
+</style>
+
+<div class="bn-page">
+
+    <!-- ══ HERO ═══════════════════════════════════════════════ -->
+    <section class="bn-hero">
+        <span class="bn-hero__badge">Odoo 19 &middot; Community Edition</span>
+        <h1 class="bn-hero__title">BlueNova Backend Theme</h1>
+        <p class="bn-hero__sub">A modern Odoo 19 Community backend experience</p>
+        <p class="bn-hero__text">
+            BlueNova modernizes the Odoo web client with a persistent app sidebar, an instant
+            light/dark mode, a KPI landing dashboard, a card-based interface, a floating chat
+            panel built on Discuss, a themed login flow, and a Settings screen that recolours
+            the entire backend &mdash; with no SCSS edit and no asset rebuild. Your Odoo apps,
+            views and access rules keep working exactly as they do today.
         </p>
-        <p class="text-center oe_mt16">
-            <span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#3959b0;vertical-align:middle;"></span>
-            Deep Indigo <code>#3959b0</code>
-            &nbsp;&nbsp;
-            <span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#0284c7;vertical-align:middle;"></span>
-            Ocean Blue <code>#0284c7</code>
+        <div class="bn-cta">
+            <a class="bn-btn bn-btn--solid" href="#features">Explore Features</a>
+            <a class="bn-btn bn-btn--ghost" href="#preview">View Screenshots</a>
+            <a class="bn-btn bn-btn--ghost" href="#docs">Documentation</a>
+        </div>
+        <div class="bn-hero__banner">
+            <img src="banner.png" alt="BlueNova Backend Theme"/>
+        </div>
+    </section>
+
+    <!-- ══ HIGHLIGHTS ═════════════════════════════════════════ -->
+    <section class="bn-sec" id="features">
+        <p class="bn-eyebrow">Product highlights</p>
+        <h2 class="bn-h2">Six things BlueNova changes</h2>
+        <p class="bn-lead">
+            Each one is a real component or stylesheet in the module &mdash; nothing here is a
+            mock-up, and nothing replaces an Odoo view.
         </p>
-        <p class="text-center">
-            Activate the app and the theme applies to the whole web client.
-            Uninstall it and Odoo goes back to its stock look — no data is touched.
+
+        <div class="bn-grid bn-grid--3">
+            <div class="bn-card">
+                <div class="bn-card__icon">&#9636;</div>
+                <h3 class="bn-card__title">Modern Dashboard</h3>
+                <p class="bn-card__text">
+                    An OWL client action with gradient hero cards, metric cards with seven-day
+                    sparklines, a 30-day column chart, a recent-activity feed, quick actions and a
+                    preview of your own open work &mdash; built from whichever apps you have
+                    installed.
+                </p>
+            </div>
+            <div class="bn-card">
+                <div class="bn-card__icon">&#9776;</div>
+                <h3 class="bn-card__title">Modern Navigation</h3>
+                <p class="bn-card__text">
+                    A persistent app rail replaces Odoo's apps dropdown &mdash; every app you can
+                    reach, always visible, with 62 bundled single-colour icons and the current app
+                    marked by an accent spine.
+                </p>
+            </div>
+            <div class="bn-card">
+                <div class="bn-card__icon">&#9681;</div>
+                <h3 class="bn-card__title">Instant Light / Dark</h3>
+                <p class="bn-card__text">
+                    One attribute on <code>&lt;html&gt;</code> flips the whole palette &mdash; no
+                    server round-trip, no second bundle, no page reload. It is what gives Odoo 19
+                    Community a working dark scheme at all.
+                </p>
+            </div>
+            <div class="bn-card">
+                <div class="bn-card__icon">&#9993;</div>
+                <h3 class="bn-card__title">Chat &amp; Communication</h3>
+                <p class="bn-card__text">
+                    A floating panel on the dashboard listing your pinned Discuss conversations,
+                    opening any of them in place with real messages and a working composer.
+                    Requires the Discuss app.
+                </p>
+            </div>
+            <div class="bn-card">
+                <div class="bn-card__icon">&#9635;</div>
+                <h3 class="bn-card__title">Smart Cards</h3>
+                <p class="bn-card__text">
+                    Hero, metric, activity, chart, quick-action, preview, chat and kanban cards
+                    &mdash; every one built from the same design tokens, so all of them follow the
+                    colour you pick, in both schemes.
+                </p>
+            </div>
+            <div class="bn-card">
+                <div class="bn-card__icon">&#9744;</div>
+                <h3 class="bn-card__title">Responsive Experience</h3>
+                <p class="bn-card__text">
+                    Explicit rules for wide screens, tablet, phone, short landscape viewports,
+                    touch pointers, reduced motion and print &mdash; on Bootstrap's breakpoints,
+                    the ones Odoo 19 itself uses.
+                </p>
+            </div>
+        </div>
+
+        <div class="bn-swatches" style="margin-top:28px;">
+            <span class="bn-swatch"><i style="background:#3959b0;"></i> Deep Indigo <code>#3959b0</code></span>
+            <span class="bn-swatch"><i style="background:#0284c7;"></i> Ocean Blue <code>#0284c7</code></span>
+            <span class="bn-swatch"><i style="background:#0b1120;"></i> Night canvas <code>#0b1120</code></span>
+            <span class="bn-swatch" style="color:#6b7280;">&mdash; all three fully repaintable from Settings</span>
+        </div>
+    </section>
+
+    <!-- ══ DASHBOARD ══════════════════════════════════════════ -->
+    <section class="bn-sec">
+        <p class="bn-eyebrow">Dashboard</p>
+        <h2 class="bn-h2">A landing page that knows what you installed</h2>
+        <p class="bn-lead">
+            The <code>bluenova_dashboard</code> client action gets its own entry in the app rail,
+            and can optionally be the page you land on right after login. One RPC builds the whole
+            page; every region degrades on its own.
         </p>
-    </div>
-</section>
 
-<section class="oe_container oe_dark">
-    <div class="oe_row oe_spaced">
-        <h3 class="oe_slogan">Design system</h3>
-        <div class="oe_span6">
-            <ul>
-                <li><b>Design tokens</b> — a single set of <code>--cmt-*</code> CSS custom
-                    properties drives every colour, radius, shadow and font in the theme</li>
-                <li><b>Palette</b> — Deep Indigo primary with Ocean Blue accents over tiered
-                    white surfaces, fully overridable per-instance from Settings</li>
-                <li><b>Typography</b> — Inter for UI text, Poppins for labels and numerics,
-                    both bundled in-module as latin-subset woff2 (no
-                    <code>fonts.googleapis.com</code> request, nothing breaks offline or
-                    under a strict CSP)</li>
-            </ul>
+        <div class="bn-split">
+            <div class="bn-panel">
+                <h4>What is on the page</h4>
+                <ul>
+                    <li><b>Hero cards</b> &mdash; the two largest figures on a brand gradient, with a
+                        30-day-vs-previous-30-day trend line</li>
+                    <li><b>Metric cards</b> &mdash; opportunities, quotations, RFQs, posted invoices,
+                        open tasks, transfers and employees, each with a seven-day sparkline</li>
+                    <li><b>IN / OUT pills</b> on Transfers, split by picking type</li>
+                    <li><b>Trend chart</b> &mdash; a column per day over 30 days, one app at a time,
+                        with chips to switch and a tooltip per column</li>
+                    <li><b>Recent activity</b> &mdash; the newest records across everything you can
+                        read; a row opens that record</li>
+                    <li><b>Quick actions</b> &mdash; &ldquo;New&nbsp;&hellip;&rdquo; shortcuts, one per
+                        model you may <i>create</i></li>
+                    <li><b>Preview</b> &mdash; your own open tasks, falling back to your pipeline,
+                        then your quotations</li>
+                </ul>
+            </div>
+            <div class="bn-panel">
+                <h4>Why the numbers are trustworthy</h4>
+                <ul>
+                    <li>Counted <b>as you</b>, never with <code>sudo()</code> &mdash; record rules
+                        apply exactly as they do in the underlying list view</li>
+                    <li>A card is <b>dropped silently</b> if its app is not installed or you cannot
+                        read it &mdash; never rendered empty or broken</li>
+                    <li>A trend with no baseline shows <b>nothing</b>, not
+                        &ldquo;+0.0%&rdquo;</li>
+                    <li>History is counted against a separate domain, so a quotation confirmed since
+                        it was written stays in the week it belongs to &mdash; charts do not sag and
+                        trends do not report phantom growth</li>
+                    <li>The chart is hand-rolled CSS geometry, <b>not a charting library</b> &mdash;
+                        no npm package, no CDN, no extra payload</li>
+                    <li>Clicking anything hands over to that app's own Odoo action</li>
+                </ul>
+            </div>
         </div>
-        <div class="oe_span6">
-            <ul>
-                <li><b>Shape &amp; elevation</b> — 8/12/16px radii, soft multi-layer shadows,
-                    glassmorphic panels, cards and dropdowns</li>
-                <li><b>Top navbar</b> restyled through Odoo's own <code>--NavBar-*</code>
-                    custom properties, so core keeps control of layout and the theme only
-                    supplies colour</li>
-                <li><b>Responsive</b> — tablet and phone breakpoints mirroring Bootstrap's;
-                    below <code>md</code> the rail steps aside for Odoo's own slide-in app
-                    menu</li>
-            </ul>
-        </div>
-    </div>
-</section>
+    </section>
 
-<section class="oe_container">
-    <div class="oe_row oe_spaced">
-        <h3 class="oe_slogan">Interface</h3>
-        <div class="oe_span6">
-            <ul>
-                <li><b>Persistent app sidebar</b> replacing Odoo's apps dropdown — every app
-                    the user can reach, always visible, current app marked by an accent
-                    spine. Toggled from the navbar's grid button; open/closed state
-                    remembered per browser</li>
-                <li><b>55+ bundled app icons</b>, single-colour and painted through a CSS
-                    mask (grey at rest, blue on hover, a stronger blue for the app you're
-                    in) — matched by module name, so the mapping keeps working regardless
-                    of the user's language. Apps without bundled artwork fall back to their
-                    own Odoo icon, then to a neutral placeholder</li>
-            </ul>
-        </div>
-        <div class="oe_span6">
-            <ul>
-                <li><b>Light / dark mode</b>, switched from the sidebar footer, applied
-                    instantly, remembered per browser. A single <code>data-cmt-theme</code>
-                    attribute on <code>&lt;html&gt;</code> covers dialogs, popovers and
-                    tooltips too — no server round-trip, no bundle rebuild</li>
-                <li><b>Control panel</b> styled as a page header</li>
-                <li><b>Kanban board</b> — 320px stage columns, glassmorphic cards with an
-                    accent spine</li>
-                <li><b>CRM pipeline stat banner</b> above the pipeline, computed entirely
-                    from data already in memory (no extra RPC)</li>
-            </ul>
-        </div>
-    </div>
-</section>
-
-<section class="oe_container oe_dark">
-    <div class="oe_row oe_spaced">
-        <h3 class="oe_slogan">Settings → Theme Settings</h3>
-        <div class="oe_span6">
-            <ul>
-                <li><b>Live colour pickers</b> for the core palette, top bar, search box,
-                    sidebar, active-app highlight and semantic colours (info / success /
-                    warning / danger) — each with its own dark-mode counterpart where the
-                    surface needs one</li>
-                <li><b>Uploadable brand image</b> for the sidebar and a login background
-                    image (light and dark), stored as attachments rather than inline, so no
-                    base64 payload rides along on every request</li>
-                <li><b>Hero typography controls</b> (title / lead size and weight) for the
-                    public home page</li>
-            </ul>
-        </div>
-        <div class="oe_span6">
-            <ul>
-                <li><b>Export / Import / Reset</b> — download the current palette as a JSON
-                    preset, re-import it later (validated field-by-field before anything is
-                    written), or reset to the compiled defaults</li>
-                <li>Every colour is validated against a strict hex / <code>rgb()</code> /
-                    <code>rgba()</code> pattern before it is saved <i>and</i> again before it
-                    is rendered into the page</li>
-                <li>Changes apply on save via a page reload — no asset-bundle rebuild, no
-                    server restart</li>
-            </ul>
-        </div>
-    </div>
-</section>
-
-<section class="oe_container">
-    <div class="oe_row oe_spaced">
-        <h3 class="oe_slogan">Themed dashboard, login, signup and public page</h3>
-        <div class="oe_span6">
-            <ul>
-                <li><b>KPI dashboard</b> — tiles for open opportunities, quotations, RFQs,
-                    posted invoices, open tasks, transfers to process and active employees.
-                    Each tile is dropped silently if its app isn't installed or the current
-                    user can't read it, and counts records as that user — never
-                    <code>sudo()</code> — so record rules apply exactly as they do in the
-                    underlying list view. Can optionally open right after login</li>
-            </ul>
-        </div>
-        <div class="oe_span6">
-            <ul>
-                <li><b>Login, signup and reset-password pages</b> pick up the same palette,
-                    plus an optional logo and tagline — and keep that styling even once the
-                    Website app is installed</li>
-                <li><b>Optional public page at "/"</b> for anonymous visitors — off by
-                    default, and it stands down automatically once the Website app is
-                    installed, since that app owns "/" properly</li>
-            </ul>
-        </div>
-    </div>
-</section>
-
-<section class="oe_container oe_dark">
-    <div class="oe_row oe_spaced">
-        <h3 class="oe_slogan">Requirements</h3>
-        <table class="table table-borderless text-center" style="max-width:640px;margin:0 auto;">
-            <tbody>
-                <tr>
-                    <td><b>Odoo</b></td>
-                    <td>19.0 (Community or Enterprise)</td>
-                </tr>
-                <tr>
-                    <td><b>Depends</b></td>
-                    <td><code>web</code>, <code>base_setup</code></td>
-                </tr>
-                <tr>
-                    <td><b>Optional</b></td>
-                    <td><code>crm</code> — only for the CRM pipeline card restyle; every
-                        dashboard tile and every other feature degrades gracefully without
-                        it</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</section>
-
-<section class="oe_container">
-    <div class="oe_row oe_spaced">
-        <h3 class="oe_slogan">Safe by design</h3>
-        <p class="oe_mt32 text-center">
-            The module adds a small settings model, a transient import wizard, and two
-            opt-in controller hooks (login redirect, public home page) — no new stored
-            business data. Its only persisted state is that transient wizard plus a
-            handful of configuration rows and attachment images holding the chosen
-            palette. It can be activated and removed at any time without migrating or
-            losing data.
+    <!-- ══ CHAT ═══════════════════════════════════════════════ -->
+    <section class="bn-sec">
+        <p class="bn-eyebrow">Communication</p>
+        <h2 class="bn-h2">A chat panel that actually sends messages</h2>
+        <p class="bn-lead">
+            A round button pinned to the corner of the dashboard opens a card with two views: your
+            conversation list, and one conversation with its composer.
         </p>
-    </div>
-</section>
 
-<section class="oe_container oe_dark">
-    <div class="oe_row oe_spaced">
-        <h3 class="oe_slogan">Known limits</h3>
-        <div class="oe_span12">
-            <ul>
-                <li>Odoo's slide-in app menu on small screens (below <code>md</code>) is left as-is.</li>
-                <li><b>Graph views stay light on purpose.</b> Odoo draws chart axis labels
-                    onto the canvas from JS using a colour that Community pins to "light"
-                    server-side, so darkening the panel would put near-black text on a
-                    near-black background — the chart keeps an explicit light card
-                    instead.</li>
-                <li>Dark mode covers the surfaces this theme styles plus the main
-                    list / form / kanban / dialog chrome. Odoo compiles most other colours
-                    into SCSS, so deeper corners — some reports, iframes and third-party
-                    widgets — can still show light patches.</li>
-                <li>The public home page has no drag-and-drop editing; it renders the
-                    company's own data plus the Settings tagline.</li>
-                <li>No fixed bottom footer bar and no floating action button.</li>
-            </ul>
+        <div class="bn-split">
+            <div class="bn-panel">
+                <h4>What it does</h4>
+                <ul>
+                    <li><b>Conversation list</b> &mdash; the channels you have pinned in Discuss, in
+                        the same order, with the last message, relative time and unread count</li>
+                    <li><b>Message area</b> &mdash; recent messages with authors, avatars and
+                        self/other bubble sides</li>
+                    <li><b>Working composer</b> &mdash; Enter sends, Shift+Enter breaks the line;
+                        OdooBot answers in the same round trip</li>
+                    <li><b>Live updates</b> &mdash; new messages arrive over the bus while the panel
+                        is open</li>
+                    <li>Opening a conversation <b>marks it read</b>, exactly as Discuss does</li>
+                    <li><b>Open Discuss</b> hands over to the real client, on the conversation you
+                        were reading</li>
+                </ul>
+            </div>
+            <div class="bn-panel">
+                <h4>What it is not</h4>
+                <ul>
+                    <li>No attachments, mentions, reactions, message editing, sub-threads or typing
+                        indicators &mdash; those are Discuss, one click away</li>
+                    <li>It is <b>not a replacement</b> for the Discuss app, and not a second
+                        messaging backend &mdash; it reads and writes the same
+                        <code>discuss.channel</code> data</li>
+                    <li>Posting is gated on your own channel membership, asked as you &mdash; the
+                        same check Discuss's own controllers run</li>
+                </ul>
+            </div>
         </div>
-    </div>
-</section>
 
-<section class="oe_container">
-    <div class="oe_row oe_spaced">
-        <h3 class="oe_slogan">Uninstall</h3>
-        <p class="oe_mt32 text-center">
-            Apps → BlueNova Backend Theme → Uninstall. The backend returns to stock Odoo
-            immediately. The module owns no business models or records, so nothing is left
-            behind but the saved palette and images, which are removed with it.
+        <div class="bn-note">
+            <strong>Requires the Discuss app.</strong> On a database without it the chat button is
+            <em>absent</em>, not disabled &mdash; and nothing else changes. The theme depends only on
+            <code>web</code> and <code>base_setup</code>, and reaches everything mail-shaped by name
+            at runtime rather than by import, so a missing Discuss costs one feature instead of
+            taking the whole backend bundle down.
+        </div>
+    </section>
+
+    <!-- ══ CARD SYSTEM ════════════════════════════════════════ -->
+    <section class="bn-sec">
+        <p class="bn-eyebrow">Card system</p>
+        <h2 class="bn-h2">One primitive, used consistently</h2>
+        <p class="bn-lead">
+            Cards are how BlueNova presents information. Each type below is a real component or
+            stylesheet in the module, and all of them read the same <code>--cmt-*</code> design
+            tokens &mdash; so a colour picked once in Settings moves every one of them, in light and
+            dark mode alike.
         </p>
-        <p class="text-center oe_mt16" style="color:#6b7280;">
-            Licensed LGPL-3. Bundled fonts (Inter, Poppins) are SIL Open Font License 1.1.
+
+        <div class="bn-grid bn-grid--3">
+            <div class="bn-card">
+                <h3 class="bn-card__title">KPI &amp; hero cards</h3>
+                <p class="bn-card__text">
+                    Brand-gradient cards carrying the two largest figures, an app glyph, a label chip
+                    and a trend line.
+                </p>
+            </div>
+            <div class="bn-card">
+                <h3 class="bn-card__title">Metric cards</h3>
+                <p class="bn-card__text">
+                    Masked app icon, label, figure, seven-day sparkline, and either IN/OUT pills or a
+                    subtitle.
+                </p>
+            </div>
+            <div class="bn-card">
+                <h3 class="bn-card__title">Activity cards</h3>
+                <p class="bn-card__text">
+                    The newest records across your apps &mdash; icon, what it was, how long ago. A row
+                    opens the record.
+                </p>
+            </div>
+            <div class="bn-card">
+                <h3 class="bn-card__title">Chart panel</h3>
+                <p class="bn-card__text">
+                    Series chips, a running total, gridlines with labelled ticks, day columns with
+                    hover tooltips.
+                </p>
+            </div>
+            <div class="bn-card">
+                <h3 class="bn-card__title">Quick-action &amp; preview cards</h3>
+                <p class="bn-card__text">
+                    &ldquo;New&nbsp;&hellip;&rdquo; shortcuts for what you may create, and a short list
+                    of your own open work.
+                </p>
+            </div>
+            <div class="bn-card">
+                <h3 class="bn-card__title">Chat, workspace &amp; kanban cards</h3>
+                <p class="bn-card__text">
+                    The chat panel, the sidebar's company/database header, and a glassmorphic restyle
+                    of Odoo's own kanban card with an accent spine.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ CALENDAR ═══════════════════════════════════════════ -->
+    <section class="bn-sec">
+        <p class="bn-eyebrow">Calendar</p>
+        <h2 class="bn-h2">Odoo's calendar, properly themed</h2>
+        <p class="bn-lead">
+            Odoo 19's calendar view is a FullCalendar&nbsp;v6 renderer, and BlueNova leaves it in
+            place. What the theme contributes is the styling that view has always been missing on
+            Community &mdash; particularly in dark mode, where an untreated calendar is a wall of
+            white.
         </p>
-    </div>
-</section>
+
+        <div class="bn-split">
+            <div class="bn-panel">
+                <h4>What the theme restyles</h4>
+                <ul>
+                    <li>The FullCalendar&nbsp;v6 palette is remapped at the source through its own
+                        <code>--fc-*</code> custom properties &mdash; page background, borders,
+                        neutral fills, the highlight wash, non-business hours, the
+                        &ldquo;+N&nbsp;more&rdquo; link and the now-indicator</li>
+                    <li>Surfaces that ignore those properties are restated by hand: the all-day
+                        strip, disabled and weekend cells, week numbers, the time-grid divider,
+                        column headers, list-view rows and the popover</li>
+                    <li>Brand colour reaches the dropdown option, the
+                        &ldquo;+N&nbsp;more&rdquo; link, the month/year toggle, and the ghost event
+                        and drag mirror while an event is being moved</li>
+                    <li>The calendar sidebar and its cells follow a Background colour picked in
+                        Settings</li>
+                </ul>
+            </div>
+            <div class="bn-panel">
+                <h4>What is unchanged</h4>
+                <ul>
+                    <li>Odoo's own day / week / month / year scales, filters, drag-and-drop and
+                        quick-create all behave exactly as they do without the theme</li>
+                    <li>No calendar view, component or action is added or replaced</li>
+                    <li>Your calendar records, models and access rules are untouched</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="bn-note">
+            <strong>Stated plainly:</strong> this is calendar <em>styling</em>, not a custom calendar.
+            BlueNova adds no event card layout, no custom scale and no extra calendar section.
+        </div>
+    </section>
+
+    <!-- ══ THEME SETTINGS (dark band) ═════════════════════════ -->
+    <section class="bn-dark">
+        <p class="bn-eyebrow">Settings &rarr; Theme Settings</p>
+        <h2 class="bn-h2">Recolour the whole backend from the UI</h2>
+        <p class="bn-lead">
+            No SCSS edit, no asset rebuild, no server restart. Changes apply on save, and the saved
+            palette is rendered into the page head on every load &mdash; straight from configuration,
+            after the compiled bundle, so it always wins.
+        </p>
+
+        <div class="bn-grid bn-grid--3">
+            <div class="bn-card">
+                <div class="bn-card__icon">&#9673;</div>
+                <h3 class="bn-card__title">Primary moves the whole brand</h3>
+                <p class="bn-card__text">
+                    Not one token &mdash; hover and pressed fills, the active-row wash, focus rings,
+                    the sidebar icon tints, the hero gradients, and Bootstrap's own primary and link
+                    colours. All derived in HSL so the hue holds and the ramp stays coordinated for
+                    any brand you pick.
+                </p>
+            </div>
+            <div class="bn-card">
+                <div class="bn-card__icon">&#9634;</div>
+                <h3 class="bn-card__title">Background moves the neutrals</h3>
+                <p class="bn-card__text">
+                    Surfaces, hairlines, scrollbars and ink all re-derive from the canvas you choose
+                    &mdash; and the ramp flips direction on a dark pick, so choosing a near-black
+                    canvas for light mode turns the ink light with it.
+                </p>
+            </div>
+            <div class="bn-card">
+                <div class="bn-card__icon">&#9881;</div>
+                <h3 class="bn-card__title">Presets &amp; safety</h3>
+                <p class="bn-card__text">
+                    Export the palette as JSON, re-import it later (validated field by field), or
+                    reset to the compiled defaults. Every colour is checked against a strict pattern
+                    on save <i>and</i> again before it is rendered.
+                </p>
+            </div>
+        </div>
+
+        <div class="bn-note" style="border-left-color:#38bdf8;background:rgba(56,189,248,.08);color:#94a3b8;">
+            <strong style="color:#f8fafc;">An untouched install stays exactly as designed.</strong>
+            A picker still holding the value it shipped with is treated as <em>unset</em>, not as a
+            choice &mdash; and the colour maths is fitted so that the shipped light and dark palettes
+            are reproduced exactly. You get the designed theme until you deliberately change it.
+        </div>
+    </section>
+
+    <!-- ══ LOGIN & PUBLIC PAGES ═══════════════════════════════ -->
+    <section class="bn-sec">
+        <p class="bn-eyebrow">Beyond the backend</p>
+        <h2 class="bn-h2">Themed login, signup and public pages</h2>
+        <div class="bn-split">
+            <div class="bn-panel">
+                <h4>Authentication pages</h4>
+                <ul>
+                    <li>Login, signup and reset-password pick up the same palette, in light and dark
+                        mode</li>
+                    <li>Optional brand logo, tagline and background image (separate light and dark),
+                        all set from Settings</li>
+                    <li>They <b>keep that styling once the Website app is installed</b>, which would
+                        otherwise replace the layout entirely</li>
+                </ul>
+            </div>
+            <div class="bn-panel">
+                <h4>Optional public home page</h4>
+                <ul>
+                    <li>A themed page at <code>/</code> for anonymous visitors, with configurable hero
+                        typography</li>
+                    <li><b>Off by default</b> &mdash; changing what <code>/</code> serves on a running
+                        instance is not a theming decision</li>
+                    <li>It <b>stands down automatically</b> when the Website app is installed, since
+                        that app owns <code>/</code> properly</li>
+                    <li>No drag-and-drop editing; it renders your company's own data plus the
+                        Settings tagline</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ ODOO 19 COMPATIBILITY ══════════════════════════════ -->
+    <section class="bn-sec">
+        <p class="bn-eyebrow">Compatibility</p>
+        <h2 class="bn-h2">Built for Odoo 19 Community</h2>
+        <p class="bn-lead">
+            BlueNova is a theme, not a fork. It layers onto the standard Odoo 19 web client through
+            supported extension points only &mdash; asset bundles, QWeb template inheritance,
+            prototype patches, a model <code>_inherit</code> and a controller subclass. No Odoo core
+            file is modified.
+        </p>
+
+        <div class="bn-split">
+            <div class="bn-panel">
+                <h4>Your Odoo keeps working</h4>
+                <ul>
+                    <li>Standard list, form, kanban, calendar, pivot and graph views are Odoo's own,
+                        rendered by Odoo's own code</li>
+                    <li>The app rail is built from Odoo's own menu service, so it shows exactly the
+                        apps Odoo would</li>
+                    <li>Every count and read runs as the current user &mdash; access rights and record
+                        rules apply unchanged</li>
+                    <li>No field is added to any business model, and no table is created</li>
+                    <li>Uninstall and the backend returns to stock Odoo immediately &mdash; no data is
+                        touched</li>
+                </ul>
+            </div>
+            <div class="bn-panel">
+                <h4>Written for 19 specifically</h4>
+                <ul>
+                    <li>OWL client actions in the <code>actions</code> registry, not legacy
+                        <code>AbstractAction</code>s</li>
+                    <li>Path-based web client routing (<code>/odoo/action-42</code>), not the hash
+                        fragment</li>
+                    <li><code>has_access</code>, not the API deprecated in 18.0</li>
+                    <li>FullCalendar&nbsp;v6 selectors and custom properties, not v4's</li>
+                    <li>Assets declared in the manifest, not as XML bundle templates</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="bn-note">
+            <strong>Community Edition is the target.</strong> Nothing in the module depends on an
+            Enterprise-only module or feature &mdash; it depends on <code>web</code> and
+            <code>base_setup</code> alone &mdash; but Enterprise has not been verified, so no
+            Enterprise claim is made here. Odoo versions other than 19.0 are not supported.
+        </div>
+    </section>
+
+    <!-- ══ TECHNICAL ══════════════════════════════════════════ -->
+    <section class="bn-dark">
+        <p class="bn-eyebrow">Under the hood</p>
+        <h2 class="bn-h2">Built with Odoo's modern web architecture</h2>
+        <p class="bn-lead">
+            Only what the module actually uses &mdash; there is no npm package, no CDN request and no
+            charting library anywhere in it.
+        </p>
+
+        <div class="bn-grid bn-grid--3">
+            <div class="bn-card">
+                <h3 class="bn-card__title">OWL 2 components</h3>
+                <p class="bn-card__text">
+                    <code>HomeDashboard</code>, <code>AppsSidebar</code> and
+                    <code>ChatLauncher</code> &mdash; with <code>useState</code>,
+                    <code>useService</code>, <code>useEffect</code>, <code>useRef</code> and
+                    module-level <code>reactive()</code> stores.
+                </p>
+            </div>
+            <div class="bn-card">
+                <h3 class="bn-card__title">XML / QWeb</h3>
+                <p class="bn-card__text">
+                    Component templates, plus <code>t-inherit</code> extensions of
+                    <code>web.WebClient</code> and <code>web.NavBar</code> that add the rail and its
+                    toggle without touching core markup.
+                </p>
+            </div>
+            <div class="bn-card">
+                <h3 class="bn-card__title">Odoo asset bundles</h3>
+                <p class="bn-card__text">
+                    A prepend into <code>web._assets_primary_variables</code>, appends into
+                    <code>web.assets_backend</code> and <code>web.assets_frontend</code> &mdash; in a
+                    load order the manifest documents and depends on.
+                </p>
+            </div>
+            <div class="bn-card">
+                <h3 class="bn-card__title">SCSS design tokens</h3>
+                <p class="bn-card__text">
+                    One <code>--cmt-*</code> custom-property set drives every colour, radius, shadow
+                    and font, with a dark scheme keyed on a single attribute.
+                </p>
+            </div>
+            <div class="bn-card">
+                <h3 class="bn-card__title">Python / ORM</h3>
+                <p class="bn-card__text">
+                    An <code>AbstractModel</code> for the dashboard and chat RPCs, a
+                    <code>res.config.settings</code> inherit, a transient import wizard, and HSL
+                    colour maths in the standard library.
+                </p>
+            </div>
+            <div class="bn-card">
+                <h3 class="bn-card__title">Bundled assets only</h3>
+                <p class="bn-card__text">
+                    Inter and Poppins as latin-subset <code>woff2</code>, 62 app icons, and a
+                    hand-rolled CSS chart &mdash; so the backend works offline and under a strict
+                    CSP.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ SCREENSHOTS ════════════════════════════════════════ -->
+    <section class="bn-sec" id="preview">
+        <p class="bn-eyebrow">Preview</p>
+        <h2 class="bn-h2">Screenshots</h2>
+        <p class="bn-lead">
+            The module currently ships its banner and app icon. UI screenshots are not bundled yet,
+            and none are referenced here that do not exist.
+        </p>
+
+        <div class="bn-grid bn-grid--2">
+            <div class="bn-card" style="padding:14px;">
+                <img src="banner.png" alt="BlueNova Backend Theme banner" style="border-radius:9px;"/>
+            </div>
+            <div class="bn-card">
+                <h3 class="bn-card__title">Screenshots to add</h3>
+                <p class="bn-card__text">
+                    Capture these into <code>static/description/screenshots/</code> and link them
+                    from this section:
+                </p>
+                <ul style="font-size:14px;color:#4b5563;margin-top:10px;">
+                    <li>Dashboard, light and dark</li>
+                    <li>The app rail, open, with an app active</li>
+                    <li>The floating chat panel &mdash; list and open thread</li>
+                    <li>Settings &rarr; Theme Settings</li>
+                    <li>Odoo's calendar under the dark palette</li>
+                    <li>A kanban board with the card restyle</li>
+                    <li>The themed login page</li>
+                    <li>The backend at phone width</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ REQUIREMENTS & INSTALL ═════════════════════════════ -->
+    <section class="bn-sec">
+        <p class="bn-eyebrow">Getting started</p>
+        <h2 class="bn-h2">Requirements &amp; installation</h2>
+
+        <div class="bn-split">
+            <div>
+                <table class="bn-table">
+                    <tbody>
+                        <tr><th>Odoo</th><td>19.0</td></tr>
+                        <tr><th>Edition</th><td>Community Edition</td></tr>
+                        <tr><th>Technical name</th><td><code>bluenova_backend_theme</code></td></tr>
+                        <tr><th>Depends</th><td><code>web</code>, <code>base_setup</code></td></tr>
+                        <tr><th>Python packages</th><td>None &mdash; standard library only</td></tr>
+                        <tr><th>Frontend packages</th><td>None &mdash; no npm, no CDN, no external font</td></tr>
+                        <tr><th>Optional at runtime</th>
+                            <td>Discuss (chat panel); CRM, Sales, Purchase, Invoicing, Project,
+                                Inventory, Employees (dashboard tiles); Website (changes login and
+                                <code>/</code> behaviour). Each is guarded &mdash; absent means the
+                                feature is absent, never broken.</td></tr>
+                        <tr><th>Stored business data</th><td>None &mdash; no new models or tables</td></tr>
+                        <tr><th>License</th><td>OPL-1 (Odoo Proprietary License v1.0)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="bn-panel">
+                <h4>Installation</h4>
+                <ol class="bn-steps">
+                    <li>Copy the module into an addons directory, keeping the folder name
+                        <code>bluenova_backend_theme</code>.</li>
+                    <li>Make sure that directory is in your <code>addons_path</code>, then restart
+                        the Odoo service.</li>
+                    <li>Enable Developer Mode, if you need it to reach <i>Update Apps List</i>.</li>
+                    <li>Apps &rarr; <i>Update Apps List</i>.</li>
+                    <li>Search for <b>BlueNova Backend Theme</b>.</li>
+                    <li>Activate it. It never installs itself.</li>
+                    <li>Hard-refresh the backend so the new bundle is fetched.</li>
+                </ol>
+                <p style="margin:16px 0 0;font-size:14px;color:#6b7280;">
+                    Then open <b>Settings &rarr; Theme Settings</b> to recolour, upload a brand
+                    image, or turn on the landing dashboard.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ KNOWN LIMITS ═══════════════════════════════════════ -->
+    <section class="bn-sec">
+        <p class="bn-eyebrow">Honest limits</p>
+        <h2 class="bn-h2">What BlueNova does not do</h2>
+        <p class="bn-lead">
+            Stated up front, so nothing on this page needs a footnote.
+        </p>
+        <div class="bn-grid bn-grid--2">
+            <div class="bn-panel">
+                <ul>
+                    <li><b>No custom calendar view.</b> The calendar work is styling of Odoo's own
+                        FullCalendar&nbsp;v6 renderer.</li>
+                    <li><b>The chat panel needs Discuss</b>, and is not a full Discuss client &mdash;
+                        no attachments, mentions, reactions, editing or typing indicators.</li>
+                    <li><b>Graph views stay light on purpose.</b> Odoo draws chart axis labels from
+                        JS using a colour Community pins to &ldquo;light&rdquo; server-side, so a
+                        dark panel would mean near-black text on a near-black background.</li>
+                    <li><b>Dark mode is not exhaustive.</b> It covers this theme's surfaces plus the
+                        main list / form / kanban / calendar / dialog chrome; some reports, iframes
+                        and third-party widgets can still show light patches.</li>
+                </ul>
+            </div>
+            <div class="bn-panel">
+                <ul>
+                    <li><b>Odoo's slide-in app menu on small screens is left as-is</b>, and the rail
+                        steps aside for it below the <code>md</code> breakpoint.</li>
+                    <li><b>No CRM-specific pipeline banner.</b> CRM kanban boards get the theme's
+                        general card styling, not a bespoke stats header &mdash; that would make the
+                        theme hard-depend on <code>crm</code>.</li>
+                    <li><b>The public home page has no drag-and-drop editing.</b> Anything richer is
+                        what the Website app is for.</li>
+                    <li><b>No fixed bottom footer bar and no floating action button.</b></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ SUPPORT ════════════════════════════════════════════ -->
+    <section class="bn-sec" id="support">
+        <p class="bn-eyebrow">Support</p>
+        <h2 class="bn-h2">Getting help</h2>
+        <p class="bn-lead">
+            Support is handled by email, by the team that wrote the module.
+        </p>
+
+        <div class="bn-split">
+            <div class="bn-panel">
+                <h4>How to reach us</h4>
+                <p class="bn-card__text">
+                    Write to <b>nirav@wewant360.com</b> &mdash; the same address listed on this
+                    module's Odoo Apps Store page. You can also use the <b>Contact&nbsp;author</b>
+                    button on that page, which reaches the same inbox.
+                </p>
+                <p class="bn-card__text" style="margin-top:12px;">
+                    Purchasing this module includes support for the issues below at no extra
+                    charge. Custom development, migrations to other Odoo versions and
+                    integration work are quoted separately.
+                </p>
+            </div>
+            <div class="bn-panel">
+                <h4>What to include</h4>
+                <ul>
+                    <li>Your Odoo version and edition (this module targets 19.0 Community).</li>
+                    <li>The module version from the Apps screen.</li>
+                    <li>What you did, what you expected, and what happened instead.</li>
+                    <li>Any red errors from the browser console, and the matching lines from the
+                        Odoo server log.</li>
+                    <li>A screenshot, where the problem is visual.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="bn-grid bn-grid--3" style="margin-top:22px;">
+            <div class="bn-card">
+                <h3 class="bn-card__title">Covered</h3>
+                <p class="bn-card__text">
+                    Installation problems, errors raised by this module, styling that breaks a
+                    standard Odoo screen, and anything on this page that does not behave as
+                    described.
+                </p>
+            </div>
+            <div class="bn-card">
+                <h3 class="bn-card__title">Not covered</h3>
+                <p class="bn-card__text">
+                    Faults in Odoo itself or in other vendors' modules, server and hosting
+                    administration, and conflicts caused by a third-party module that also
+                    restyles the backend.
+                </p>
+            </div>
+            <div class="bn-card">
+                <h3 class="bn-card__title">Before you write</h3>
+                <p class="bn-card__text">
+                    Try the module on a database with only BlueNova installed. If the problem
+                    disappears, another backend theme or web module is competing with it, and
+                    naming that module lets us fix the conflict far faster.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ FOOTER ═════════════════════════════════════════════ -->
+    <footer class="bn-foot" id="docs">
+        <div class="bn-foot__name">BlueNova Backend Theme</div>
+        <div>Odoo 19 Community Edition &nbsp;&middot;&nbsp; version 19.0.1.0.0 &nbsp;&middot;&nbsp; OPL-1</div>
+        <div class="bn-foot__links">
+            <a href="https://www.odoo.com/documentation/19.0/">Odoo 19 Documentation</a>
+            <a href="https://www.odoo.com/documentation/19.0/administration/install.html">Installing Odoo</a>
+            <a href="https://www.odoo.com/documentation/19.0/developer/tutorials/discover_js_framework.html">Odoo 19 Web Framework</a>
+        </div>
+        <div>
+            Module documentation: <code>README.md</code> in the module root.<br/>
+            By <a href="https://strats360.com/">Strats360 Technolabs-LLP</a>.
+        </div>
+        <p style="margin-top:18px;font-size:13px;">
+            Bundled fonts (Inter, Poppins) are licensed under the SIL Open Font License 1.1.
+            Odoo is a trademark of Odoo S.A.
+        </p>
+    </footer>
+
+</div>
