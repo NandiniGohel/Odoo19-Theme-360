@@ -1422,6 +1422,31 @@
         color: var(--cmt-text);
     }
 
+    // The progressbar widget's *track*, which the block above does not
+    // reach — it clears fills, and half of what makes this one read as a
+    // white chip is its outline. progress_bar_field.scss compiles
+    //
+    //   .o_progressbar .o_progress {
+    //       border: 1px solid $o-gray-300;
+    //       background-color: $o-view-background-color;
+    //   }
+    //
+    // — two build-time literals, so the track stayed a pure-white slab
+    // inside a light-grey hairline wherever the widget lands: the
+    // "Certified" and "Passed" bars on the Surveys kanban, the CRM
+    // form's probability bar, every progressbar field in a list. Only
+    // the *fill* followed the theme, which inverts the reading of the
+    // control — the unfilled remainder was the brightest thing on the
+    // card, so an empty bar looked like a full one.
+    //
+    // --cmt-surface-highest is the same token .o_column_progress takes
+    // above, so the two progress treatments in the backend stay one
+    // step lighter than whatever they sit on rather than diverging.
+    .o_progressbar .o_progress {
+        background-color: var(--cmt-surface-highest) !important;
+        border-color: var(--cmt-border) !important;
+    }
+
     // Activity view: the filter tints are 5% mixes into
     // $o-webclient-background-color, so they land as near-white washes
     // rather than as tints. Remixed against the dark canvas.
@@ -1644,6 +1669,47 @@
         &::before {
             background-color: transparent !important;
         }
+    }
+
+    // ── Surveys kanban: the certification card ───────────────
+    // Same failure as the Live Chat card above, by a different route —
+    // and one the card-fill rules further up cannot catch, because this
+    // is a background *image*, not a background-color.
+    //
+    // survey_survey_views.scss stacks two layers on every certification
+    // card:
+    //
+    //   background-image:
+    //       linear-gradient(rgba($o-view-background-color, .75),
+    //                       rgba($o-view-background-color, .75)),
+    //       url(/survey/static/src/img/trophy-solid.svg);
+    //
+    // The gradient is a scrim whose only job is to knock the trophy
+    // watermark back to a quarter of its strength. It is spelled as
+    // 75% of the *view background*, which is a build-time literal —
+    // white — so in dark mode it stopped being a scrim and became a
+    // sheet: 0.75 white over --cmt-glass-bg composites to #c5c7ce, and
+    // the ungrouped `background-size: auto 75%` painted that as a light
+    // band across the middle 75% of the card. The card's own text is
+    // --cmt-text, so the one certification on the board came back pale
+    // grey on near-white while every other row stayed dark.
+    //
+    // Restated as the card fill at the same 75%, which is what the
+    // literal meant: it composites to exactly --cmt-glass-bg and leaves
+    // the trophy at #384056 — a faint lift off the card, the same read
+    // the light scheme gets from the same 25%.
+    //
+    // The trophy URL has to be repeated because a background-image is
+    // one list; there is no way to restate the first layer and keep the
+    // second. !important for the reason at the top of this file — the
+    // ungrouped block in survey_survey_views.scss carries four classes
+    // and this theme's asset order against another module's is not
+    // knowable from here.
+    .o_survey_kanban_card_certification {
+        background-image:
+            linear-gradient(color-mix(in srgb, var(--cmt-glass-bg) 75%, transparent),
+                            color-mix(in srgb, var(--cmt-glass-bg) 75%, transparent)),
+            url(/survey/static/src/img/trophy-solid.svg) !important;
     }
 
     // ── Onboarding panel ─────────────────────────────────────

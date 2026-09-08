@@ -111,9 +111,11 @@
 // --bs-primary-rgb (so it already follows the picker) but compiles the
 // *text* as color-contrast($primary), frozen against whatever the brand
 // was at build time, so a pale pick would keep white text on it.
-// --cmt-on-primary is the same choice made at page load against the
-// colour actually picked. !important because Bootstrap's utilities
-// carry it and would otherwise win.
+// --cmt-on-primary is the scheme's own ink — white in light, the dark
+// canvas in dark — so the pill reads like every other brand fill in the
+// backend whatever Primary becomes, instead of being frozen against a
+// build-time brand. !important because Bootstrap's utilities carry it
+// and would otherwise win.
 .text-bg-primary {
     color: var(--cmt-on-primary) !important;
 }
