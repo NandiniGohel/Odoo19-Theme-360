@@ -358,6 +358,54 @@
 .bn-foot__links { margin: 16px 0 20px; }
 .bn-foot__links a { margin: 0 10px; }
 
+/* ── Screenshot gallery ─────────────────────────────────────────
+   The captures come as light/dark pairs, so the gallery is built
+   out of pairs rather than a flat grid: for a theme whose selling
+   point is that both schemes are hand-built, showing the same
+   screen twice side by side *is* the argument. Each figure carries
+   its own scheme tag so the pair reads correctly even when the two
+   images stack on a narrow screen. */
+.bn-shots { display: grid; gap: 34px; }
+.bn-shot__head {
+    display: flex; align-items: baseline; flex-wrap: wrap;
+    gap: 6px 12px; margin-bottom: 12px;
+}
+.bn-shot__title {
+    margin: 0; font-size: 17px; font-weight: 600;
+    letter-spacing: -.01em; color: var(--bn-ink);
+}
+.bn-page .bn-shot__note {
+    margin: 0; font-size: 14px; color: var(--bn-ink-faint);
+    flex: 1 1 260px; min-width: 0;
+}
+.bn-shot__pair { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.bn-shot__fig {
+    margin: 0; border: 1px solid var(--bn-border);
+    border-radius: 10px; overflow: hidden;
+    background: var(--bn-surface); box-shadow: var(--bn-shadow);
+}
+.bn-shot__fig img { display: block; width: 100%; height: auto; }
+/* The Theme Settings capture is a full-page shot at 1920x2913. Left
+   unconstrained it is taller than the rest of the section put
+   together, so it is capped and anchored to the top, where the
+   colour pickers are. */
+.bn-shot__fig--tall img { max-height: 640px; object-fit: cover; object-position: top; }
+.bn-shot__cap {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 14px; border-top: 1px solid var(--bn-border);
+    font-size: 13px; color: var(--bn-ink-faint);
+}
+.bn-scheme {
+    display: inline-block; width: 9px; height: 9px;
+    border-radius: 50%; flex: none;
+    border: 1px solid rgba(17,24,39,.18);
+}
+.bn-scheme--light { background: #f8f9fa; }
+.bn-scheme--dark  { background: #0b1120; border-color: rgba(255,255,255,.28); }
+.bn-dark .bn-shot__title { color: #f8fafc; }
+.bn-dark .bn-shot__fig { background: var(--bn-night-2); border-color: #243149; }
+.bn-dark .bn-shot__cap { border-top-color: #243149; color: var(--bn-night-sub); }
+
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 900px) {
     .bn-grid--3 { grid-template-columns: repeat(2, 1fr); }
@@ -378,6 +426,11 @@
     .bn-h2 { font-size: 24px; }
     .bn-sec { padding: 40px 0; }
     .bn-table th { width: 42%; }
+    /* Below this width a side-by-side pair renders each screenshot too
+       small to read, so the pair stacks and the scheme tag under each
+       image becomes the thing that tells them apart. */
+    .bn-shot__pair { grid-template-columns: 1fr; }
+    .bn-shot__fig--tall img { max-height: 460px; }
 }
 </style>
 
@@ -876,31 +929,169 @@
         <p class="bn-eyebrow">Preview</p>
         <h2 class="bn-h2">Screenshots</h2>
         <p class="bn-lead">
-            The module currently ships its banner and app icon. UI screenshots are not bundled yet,
-            and none are referenced here that do not exist.
+            Every screen below is shown twice &mdash; once in each colour scheme. Both are
+            hand-built palettes rather than an inverted filter, which is the difference the
+            pairs are here to show.
         </p>
 
-        <div class="bn-grid bn-grid--2">
-            <div class="bn-card" style="padding:14px;">
-                <img src="banner.png" alt="BlueNova Backend Theme banner" style="border-radius:9px;"/>
+        <div class="bn-shots">
+
+            <div class="bn-shot">
+                <div class="bn-shot__head">
+                    <h3 class="bn-shot__title">Dashboard</h3>
+                    <p class="bn-shot__note">
+                        Gradient hero cards with a 30-day trend, metric cards with sparklines,
+                        the column chart and the activity feed &mdash; built from whichever
+                        apps are installed.
+                    </p>
+                </div>
+                <div class="bn-shot__pair">
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/LightthemeDashboard.png"
+                             alt="BlueNova dashboard in light mode: hero cards, metric cards with sparklines, a 30-day column chart and an activity feed"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
+                    </figure>
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/DarkthemeDashboard.png"
+                             alt="The same BlueNova dashboard in dark mode"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--dark"></span>Dark mode</figcaption>
+                    </figure>
+                </div>
             </div>
-            <div class="bn-card">
-                <h3 class="bn-card__title">Screenshots to add</h3>
-                <p class="bn-card__text">
-                    Capture these into <code>static/description/screenshots/</code> and link them
-                    from this section:
-                </p>
-                <ul style="font-size:14px;color:#4b5563;margin-top:10px;">
-                    <li>Dashboard, light and dark</li>
-                    <li>The app rail, open, with an app active</li>
-                    <li>The floating chat panel &mdash; list and open thread</li>
-                    <li>Settings &rarr; Theme Settings</li>
-                    <li>Odoo's calendar under the dark palette</li>
-                    <li>A kanban board with the card restyle</li>
-                    <li>The themed login page</li>
-                    <li>The backend at phone width</li>
-                </ul>
+
+            <div class="bn-shot">
+                <div class="bn-shot__head">
+                    <h3 class="bn-shot__title">Theme Settings</h3>
+                    <p class="bn-shot__note">
+                        Settings &rarr; Theme Settings. Picking one Primary moves the whole
+                        brand family; picking a Background moves the whole neutral ramp.
+                        Capped here &mdash; the real page runs longer.
+                    </p>
+                </div>
+                <div class="bn-shot__pair">
+                    <figure class="bn-shot__fig bn-shot__fig--tall">
+                        <img src="screenshots/LightthemeCustomColorSettings.png"
+                             alt="The Theme Settings page in light mode, showing the light and dark colour picker blocks"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
+                    </figure>
+                    <figure class="bn-shot__fig bn-shot__fig--tall">
+                        <img src="screenshots/DarkthemeCustomColorSettings.png"
+                             alt="The Theme Settings page in dark mode"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--dark"></span>Dark mode</figcaption>
+                    </figure>
+                </div>
             </div>
+
+            <div class="bn-shot">
+                <div class="bn-shot__head">
+                    <h3 class="bn-shot__title">Kanban &mdash; CRM pipeline</h3>
+                    <p class="bn-shot__note">
+                        Column headers, progress bars and card surfaces, with the persistent
+                        app rail down the left.
+                    </p>
+                </div>
+                <div class="bn-shot__pair">
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/LightthemePipeline.png"
+                             alt="A CRM pipeline kanban board in light mode with the BlueNova app rail"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
+                    </figure>
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/DarkthemePipeline.png"
+                             alt="The same CRM pipeline kanban board in dark mode"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--dark"></span>Dark mode</figcaption>
+                    </figure>
+                </div>
+            </div>
+
+            <div class="bn-shot">
+                <div class="bn-shot__head">
+                    <h3 class="bn-shot__title">List view &mdash; Employees</h3>
+                    <p class="bn-shot__note">
+                        The screen people actually spend the day in: table rows, the search
+                        panel, the control panel and the pager.
+                    </p>
+                </div>
+                <div class="bn-shot__pair">
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/LightthemeEmployees.png"
+                             alt="The Employees list view in light mode"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
+                    </figure>
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/DarkthemeEmployees.png"
+                             alt="The Employees list view in dark mode"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--dark"></span>Dark mode</figcaption>
+                    </figure>
+                </div>
+            </div>
+
+            <div class="bn-shot">
+                <div class="bn-shot__head">
+                    <h3 class="bn-shot__title">Form view</h3>
+                    <p class="bn-shot__note">
+                        A new record: the sheet, the status bar, notebook headers and input
+                        styling.
+                    </p>
+                </div>
+                <div class="bn-shot__pair">
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/LightthemeAddNew.png"
+                             alt="A record form in light mode, showing the sheet, status bar and notebook"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
+                    </figure>
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/DarkthemeAddNew.png"
+                             alt="The same record form in dark mode"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--dark"></span>Dark mode</figcaption>
+                    </figure>
+                </div>
+            </div>
+
+            <div class="bn-shot">
+                <div class="bn-shot__head">
+                    <h3 class="bn-shot__title">Login &mdash; with a background image</h3>
+                    <p class="bn-shot__note">
+                        The background image, logo and tagline are all set from Theme Settings.
+                        Light and dark each take their own image.
+                    </p>
+                </div>
+                <div class="bn-shot__pair">
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/LightthemeLoginWithbg.png"
+                             alt="The themed login page in light mode with a background image"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
+                    </figure>
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/DarkthemeLoginWithbg.png"
+                             alt="The themed login page in dark mode with a background image"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--dark"></span>Dark mode</figcaption>
+                    </figure>
+                </div>
+            </div>
+
+            <div class="bn-shot">
+                <div class="bn-shot__head">
+                    <h3 class="bn-shot__title">Login &mdash; plain</h3>
+                    <p class="bn-shot__note">
+                        The same page with no background image uploaded, which is how it looks
+                        the moment the module is installed.
+                    </p>
+                </div>
+                <div class="bn-shot__pair">
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/LightthemeLoginWithoutbg.png"
+                             alt="The themed login page in light mode without a background image"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
+                    </figure>
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/DarkthemeLoginWithoutbg.png"
+                             alt="The themed login page in dark mode without a background image"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--dark"></span>Dark mode</figcaption>
+                    </figure>
+                </div>
+            </div>
+
         </div>
     </section>
 
