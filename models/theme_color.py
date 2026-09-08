@@ -58,10 +58,14 @@ _RGB_RE = re.compile(
     r"^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*[\d.%]+\s*)?\)$"
 )
 
-# What sits *on* a brand fill. Not black and white: the light option is
-# plain white, but the dark option is the theme's own canvas (#0b1120,
-# --cmt-bg in dark mode) rather than #000, so a pale brand reads as a
-# hole punched in the surface instead of a black slab.
+# What sits *on* a brand fill — the value of --cmt-on-primary, which is
+# what .btn-primary, the hero card and the login action all take as ink.
+#
+# Not black and white: the light option is plain white, but the dark
+# option is the theme's own canvas (#0b1120) rather than #000, so a pale
+# brand reads as a hole punched in the surface instead of a black slab.
+# They are exactly what variables.scss and dark_mode.scss compile — see
+# _ink_for_scheme() below for why the pair is now used as-is.
 _ON_LIGHT = "#ffffff"
 _ON_DARK = "#0b1120"
 
@@ -169,28 +173,37 @@ def adjust(rgb, saturation=1.0, lightness=1.0, min_sat=None, max_sat=None,
     return _from_hsl(h, s, l)
 
 
-def luminance(rgb):
-    """WCAG relative luminance, 0.0 (black) – 1.0 (white)."""
-    channels = []
-    for c in rgb:
-        c = c / 255.0
-        channels.append(c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4)
-    r, g, b = channels
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+def _ink_for_scheme(dark):
+    """The ink on a brand fill: the scheme's own, not the pick's.
 
+    This used to be a per-colour contrast decision — WCAG luminance
+    against a crossover at L = 0.197, white below it and the near-black
+    canvas above. It was correct on the numbers and wrong on screen.
 
-def on_color(rgb):
-    """Pick readable ink for text/icons sitting on ``rgb``.
+    The brand fill is *not* the only thing --cmt-on-primary lands on. It
+    is the ink for .btn-primary and the outline button's filled states
+    (buttons_misc.scss), the "Enterprise" pill (brand_bridge.scss), the
+    chat launcher and the dashboard hero — surfaces that already sit in
+    a scheme, next to buttons the picker does not move. So a mid-tone
+    pick like a #16a34a green, which clears the crossover at L = 0.28,
+    flipped every one of those to near-black while the theme around them
+    stayed a light scheme with white button labels: the Add button on a
+    To-do form came back black-on-green next to an untouched backend.
 
-    0.2, not the usual 0.5. The threshold is not a midpoint, it is the
-    crossover: white scores ``1.05 / (L + 0.05)`` against the fill and
-    the near-black ink scores ``(L + 0.05) / 0.058``, and those two are
-    equal at L = 0.197. Above it the dark ink wins, and by a wide
-    margin — dark mode's #7c9aff sits at L = 0.36, where white lands at
-    2.6:1 (the failure buttons_misc.scss documents on .btn-primary) and
-    the canvas ink at 7.1:1.
+    The scheme's compiled ink is the value those surfaces are designed
+    against — white in light, #0b1120 in dark — and holding it means the
+    Primary picker moves fills only, which is what picking a fill colour
+    is understood to do. It is also what an untouched install already
+    shows, so the two cases no longer disagree.
+
+    The cost is real and worth stating: a light scheme given a pale
+    Primary (a yellow, a pastel) now gets white ink on it and can drop
+    under 4.5:1, where the old crossover would have caught it. That is a
+    choice about *one* colour the admin can see and re-pick, against a
+    flip that silently repainted ink across the backend — and Button
+    Text is its own picker on the settings screen for exactly this case.
     """
-    return _ON_DARK if luminance(rgb) > 0.2 else _ON_LIGHT
+    return _ON_DARK if dark else _ON_LIGHT
 
 
 def derive_brand_vars(primary, dark=False):
@@ -215,7 +228,7 @@ def derive_brand_vars(primary, dark=False):
         return {}
 
     triplet = to_triplet(rgb)
-    ink = on_color(rgb)
+    ink = _ink_for_scheme(dark)
 
     if dark:
         # Pale brand on a near-black canvas: "dark" means *lifted*, and
@@ -405,13 +418,13 @@ def derive_accent_vars(primary, dark=False):
         # The ceiling is raised to the brand's own lightness rather
         # than being the flat .56 it reads as, because a flat one is a
         # ceiling that turns into a floor: a pale brand like #a5b4fc
-        # sits at L .82, so .56 pulled its accent *down* to a deep blue
-        # — and the hero ink had already been chosen from the pale
-        # brand, so the card ended up with near-black text on a dark
-        # far corner at 3.1:1. Whatever this returns has to stay on the
-        # same side of on_color()'s crossover as the brand it came
-        # from, and never being darker than the brand is the cheap way
-        # to guarantee that.
+        # sits at L .82, so .56 pulled its accent *down* to a deep blue,
+        # and the hero gradient ended up running from a pale near-white
+        # into a dark far corner under one ink. The ink is the scheme's
+        # (--cmt-hero-ink is --cmt-on-primary, so in light mode it is
+        # white), and it has to stay readable across the whole sweep —
+        # never letting the far stop be darker than the brand is the
+        # cheap way to keep the two ends on one side of that.
         lightness = _to_hsl(rgb)[2]
         accent = adjust(rgb, min_sat=floor(0.45), saturation=1.30, max_sat=0.92,
                         lightness=1.22, clamp_l=(0.40, max(0.56, lightness)))
@@ -617,10 +630,10 @@ _PAPER_FLOOR_ON_LIGHT = 0.90
 _PAPER_CEILING_ON_DARK = 0.30
 
 # Which way the ramp stacks. HSL lightness, not WCAG luminance: this
-# picks a *direction* for a ramp, not readable ink for a fill (that is
-# on_color()'s job, and its threshold is set by a contrast crossover
-# that has no bearing here). A canvas is "light" when there is more
-# room below it than above.
+# picks a *direction* for a ramp — where the surfaces and the ink go
+# relative to the canvas — not a single readable colour to drop on a
+# fill. A canvas is "light" when there is more room below it than
+# above.
 _CANVAS_IS_LIGHT_ABOVE = 0.5
 
 
