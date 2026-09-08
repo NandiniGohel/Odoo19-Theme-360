@@ -667,10 +667,15 @@ The dark palette is the same token set redeclared under `:root[data-cmt-theme="d
 [`dark_mode.scss`](static/src/scss/dark_mode.scss) — edit the two blocks in parallel and both modes
 stay in step.
 
-Two caveats:
+Three caveats:
 
 - Any token the Settings screen also exposes a picker for is **overridden at runtime** by a saved
   value. The SCSS default is what a fresh install shows.
+- `--cmt-on-primary` — the ink on every brand fill (`.btn-primary`, the outline button's filled
+  states, the `Enterprise` pill, the hero card, the login action) — is **not** derived from Primary.
+  It stays the scheme's own: `#ffffff` in light, `#0b1120` in dark. Picking Primary moves fills, not
+  ink. Override it per scheme with the **Button Text** / **Button Text (Dark)** pickers, which is
+  also where to go if a deliberately pale Primary needs dark labels.
 - The brand *shades* (`--cmt-primary-dark/-light/-soft/-rgb`, `--cmt-on-primary-container`,
   `--cmt-app-icon-hover/-active`) and the neutral ramp are the compiled defaults **until** Primary or
   Background is picked, after which they are derived. `theme_color.py`'s multipliers are fitted to
