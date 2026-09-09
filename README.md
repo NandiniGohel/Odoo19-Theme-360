@@ -2,901 +2,694 @@
   <img src="static/description/banner.png" alt="BlueNova Backend Theme" width="100%">
 </p>
 
-<h1 align="center">BlueNova Backend Theme</h1>
+# BlueNova Backend Theme
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Odoo-19.0%20Community-714B67" alt="Odoo 19.0 Community">
-  <img src="https://img.shields.io/badge/license-OPL--1-blue" alt="OPL-1">
-  <img src="https://img.shields.io/badge/data%20model-no%20new%20tables-success" alt="No new stored data models">
-</p>
+[![Odoo](https://img.shields.io/badge/Odoo-19.0-714B67.svg)](https://www.odoo.com/documentation/19.0/)
+[![License](https://img.shields.io/badge/license-OPL--1-blue.svg)](https://www.odoo.com/documentation/19.0/legal/licenses.html)
+[![Version](https://img.shields.io/badge/version-19.0.1.0.0-informational.svg)](__manifest__.py)
 
-<p align="center">
-  Modernize your Odoo 19 Community backend with a persistent app sidebar, an instant light/dark
-  mode, a KPI landing dashboard with a floating Discuss chat panel, themed login and public pages,
-  and an in-app Settings screen that recolours the entire web client without an SCSS edit or an
-  asset rebuild.<br>
-  Technical name: <code>bluenova_backend_theme</code>
-</p>
+A minimalist, glassmorphic reskin of the Odoo 19 backend — deep royal blue and
+electric blue accents, silver/chrome metallic gradients, soft multi-layer
+shadows and glass panels — plus the pieces a visual theme usually leaves out: a
+persistent app sidebar, an instant light/dark switch, themed
+login/signup/reset-password screens, a KPI landing dashboard with a live chat
+bubble, an optional public home page, and an in-app settings screen that
+recolours the entire theme without touching SCSS or rebuilding assets.
+
+Uninstall the module and Odoo returns to its default look. No business data is
+modified.
 
 ---
 
-## 1. Overview
+## Table of contents
 
-**BlueNova Backend Theme** is a backend (web client) theme for **Odoo 19 Community Edition**. It
-restyles the standard Odoo web client and adds a small number of opt-in backend features on top of
-it, without replacing or reimplementing any of Odoo's own views.
+- [Highlights](#highlights)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Configuration — Settings › Theme Settings](#configuration--settings--theme-settings)
+- [Presets: export, import, reset](#presets-export-import-reset)
+- [The landing dashboard](#the-landing-dashboard)
+- [The chat bubble](#the-chat-bubble)
+- [Authentication pages](#authentication-pages)
+- [The optional public home page](#the-optional-public-home-page)
+- [How the theming works](#how-the-theming-works)
+- [Module layout](#module-layout)
+- [Customising & extending](#customising--extending)
+- [Technical reference](#technical-reference)
+- [Uninstalling](#uninstalling)
+- [License & credits](#license--credits)
 
-**What it solves.** The stock Odoo backend hides every app behind a dropdown, offers no per-instance
-branding short of recompiling SCSS, has no landing page of its own, and — on Community, where
-`$enable-dark-mode` is compiled off — has no working dark scheme. BlueNova addresses those four
-things specifically.
+---
 
-**What it does *not* do.** It does not fork or replace Odoo's list, form, kanban, calendar, pivot or
-graph views. Those remain Odoo's own components, rendered by Odoo's own code; the theme supplies
-colour, spacing, elevation and typography around them. Every business record you see through
-BlueNova is the same record, read through the same ORM, subject to the same access rights and record
-rules.
+## Highlights
 
-**Reversible by construction.** The module defines **no new stored business data**. Its only
-persisted state is a `TransientModel` (the preset-import wizard), a set of `ir.config_parameter`
-rows holding the chosen palette, and up to three `ir.attachment` images. Uninstalling removes all of
-it and the backend returns to stock Odoo.
+**Visual**
+
+- Deep Indigo / Royal Blue brand (`#3959b0`) with an Ocean Blue accent, silver
+  chrome gradients and glossy metallic fills.
+- Glassmorphic panels, cards, dropdowns and popovers; clean paper content area
+  with subtle depth.
+- Bundled **Inter** (UI/display) and **Poppins** (labels, numbers) latin-subset
+  webfonts — shipped in-module, so nothing is fetched from Google Fonts.
+- Restyles the whole web client: navbar, control panel, breadcrumbs, list, form,
+  kanban, pivot, calendar, activity, dialogs, chatter, Discuss, notifications
+  and the settings screen itself.
+- Bundled single-colour app-icon set (~80 icons) painted through a CSS mask, so
+  icon colour follows hover/active state.
+
+**Behaviour**
+
+- **Persistent apps sidebar** replacing Odoo's apps dropdown — every app the
+  user can access, the current one highlighted, real `href`s so ctrl/middle
+  click opens a new tab. Open/closed state remembered per browser.
+- **Instant light/dark mode** from a navbar toggle. This is the theme's own
+  scheme (one attribute on `<html>`), not Odoo's `color_scheme` cookie — no
+  second asset bundle, no page reload.
+- **Fully responsive**: width, height *and* input-type aware — hover language is
+  fenced off from touch devices and re-expressed as `:active`.
+
+**Configurable**
+
+- ~50 colour pickers (light and dark), hero typography controls, uploadable
+  login background images per scheme, a login tagline, and two feature toggles —
+  all under **Settings › Theme Settings**, applied on save with **no asset
+  rebuild and no server restart**.
+- Pick *one* Primary and the whole brand ramp is re-derived — hover fills, focus
+  rings, active nav rows, kanban washes, the dashboard hero gradient, plus
+  Bootstrap's own `:root` brand variables. Same for Background: one pick
+  produces the entire neutral ramp (surfaces, borders, scrollbars, ink).
+- JSON preset **export / import / reset**.
+
+---
+
+## Requirements
 
 | | |
 |---|---|
-| Target platform | Odoo 19 Community Edition |
-| Module type | Backend / web client theme (`category: Themes/Backend`) |
-| Odoo dependencies | `web`, `base_setup` |
-| Stored business models | none |
-| License | OPL-1 (Odoo Proprietary License v1.0) |
+| **Odoo** | 19.0 **Community** |
+| **Depends on** | `web`, `base_setup` |
+| **Enterprise** | Not tested — no Enterprise compatibility is claimed |
+| **License** | OPL-1 (Odoo Proprietary License v1.0) |
+| **Optional integrations** | `auth_signup` (signup/reset pages), `mail`/Discuss (chat bubble), `crm`, `sale`, `purchase`, `account`, `project`, `stock`, `hr` (dashboard tiles), `website` (the theme stands down on `/`) |
+
+Nothing in the optional list is a dependency. Every feature that touches an
+optional module is guarded twice — *is it installed* and *may this user read it*
+— and degrades silently when either answer is no.
 
 ---
 
-## 2. Key Features
+## Installation
 
-Everything in this section is present in the source tree and registered in
-[`__manifest__.py`](__manifest__.py). Where a capability is narrower than its name suggests, the
-limit is stated rather than omitted — see also [Known limitations](#known-limitations).
+1. Copy the `bluenova_backend_theme` folder into your addons path.
+2. Restart the Odoo service.
+3. **Apps → Update Apps List**, then search for *BlueNova Backend Theme* and
+   click **Activate**.
+4. Hard-refresh the browser once (the backend asset bundle is rebuilt on
+   install).
 
-### 2.1 Modern backend UI
+The module is listed as an application (`'application': True`) so it gets its
+own card under Apps, and `auto_install` is `False` — it never activates itself
+just for sitting in the addons path.
 
-- **Design tokens.** One set of `--cmt-*` CSS custom properties drives every colour, radius, shadow
-  and font in the theme, declared in [`static/src/scss/variables.scss`](static/src/scss/variables.scss).
-  Nothing in the theme hardcodes a colour twice.
-- **Shipped palette.** Deep Indigo `#3959b0` primary with an Ocean Blue `#0284c7` accent family over
-  tiered white surfaces. Both are overridable per-instance from Settings (§2.5).
-- **Shape & elevation.** Rounded corners, soft multi-layer shadows, and glassmorphic panels, cards
-  and dropdowns.
-- **Typography.** Inter for UI text, Poppins for labels and numerics — both bundled in-module as
-  latin-subset `woff2` files under [`static/src/fonts/`](static/src/fonts/), so the backend makes no
-  `fonts.googleapis.com` request and nothing breaks offline or under a strict CSP.
-- **Surfaces restyled.** Top navbar (through Odoo's own `--NavBar-*` custom properties), control
-  panel as a page header, kanban boards, list and form chrome, dropdowns, dialogs, popovers,
-  notifications, the Settings screen, and buttons.
+> **Developer mode / asset issues:** if the theme looks half-applied after an
+> upgrade, regenerate the bundles with
+> `Settings → Technical → User Interface → Clear Assets`, or restart with
+> `-u bluenova_backend_theme --dev=assets`.
 
-### 2.2 Persistent app sidebar
+---
 
-- Replaces Odoo's apps dropdown with an always-visible rail listing **every app the user can reach**
-  — built from the same `menuService.getApps()` the dropdown uses, so it inherits Odoo's own menu
-  access filtering. The current app is marked with an accent spine.
-- **62 bundled app icons** ([`static/src/image/icons/`](static/src/image/icons/)), single-colour
-  artwork painted through a CSS mask so one icon carries every state (rest, hover, active).
-- Icons are matched by the **module part of the app's xmlid** (`crm.crm_menu_root` → `crm`) in
-  [`static/src/js/apps_sidebar.js`](static/src/js/apps_sidebar.js), so the mapping keeps working in
-  every language. Two narrower maps handle the cases the module alone cannot resolve: an exact-xmlid
-  map (`base` owns both Apps and Settings) and a display-name map. An app with no match — and an app
-  whose icon fails to decode — falls back to the bundled `custom.png` placeholder.
-- Toggled from a grid button in the navbar; the open/closed state is remembered per browser
-  (`cmt_apps_sidebar_open` in `localStorage`).
-- Hidden below the `md` breakpoint, where Odoo's own slide-in app menu takes over untouched.
-- Implemented as an OWL component mounted into `WebClient.components`, with the mount point added by
-  a QWeb template inherit — see [`static/src/xml/apps_sidebar.xml`](static/src/xml/apps_sidebar.xml)
-  and [`apps_sidebar_patch.js`](static/src/js/apps_sidebar_patch.js). No core file is modified.
+## Configuration — Settings › Theme Settings
 
-### 2.3 Light / dark mode
+Go to **Settings** and open the **Theme Settings** entry in the left rail. The
+screen is organised into five blocks:
 
-- Switched from the sidebar footer, applied instantly, remembered per browser (`cmt_color_scheme` in
-  `localStorage`).
-- The entire dark palette hangs off a single `data-cmt-theme` attribute on `<html>`, so dialogs,
-  popovers and tooltips — which Odoo portals out to `<body>` — are covered too.
-- **This is a separate mechanism from Odoo's own dark mode** (the `color_scheme` cookie and the
-  `web.assets_web_dark` bundle). Odoo's switch rebuilds a second asset bundle server-side and reloads
-  the page; this one flips an attribute, with no server round-trip and no bundle rebuild. It is also
-  what makes a dark scheme available at all on Community, where Bootstrap is compiled with
-  `$enable-dark-mode: false` and the `[data-bs-theme=dark]` block therefore never exists.
-- [`static/src/scss/dark_mode.scss`](static/src/scss/dark_mode.scss) is loaded last in the backend
-  bundle and re-tints every surface the theme owns, plus the main list / form / kanban / dialog
-  chrome.
+| Block | Contains |
+|---|---|
+| **Presets & Assets** | Import Settings, Export Settings, Reset All Theme Settings |
+| **Home Page** | Themed Public Home Page, Open Dashboard After Login, Hero Typography (title/lead size & weight) |
+| **Authentication Pages** | Login panels & actions (light + dark), Semantic colours, Login branding (brand-image logo, tagline), Login background images (light + dark) |
+| **Light Mode Colors** | Core colours, Top Bar, Sidebar Base, Active Menu, Home Page colours |
+| **Dark Mode Colors** | The same five groups, for the dark scheme |
 
-### 2.4 Dashboard
+### What each colour group covers
 
-An optional landing page registered as the **`bluenova_dashboard` client action**
-([`views/home_dashboard_actions.xml`](views/home_dashboard_actions.xml)), with its own root menu so
-it appears as an app in the rail. The client is an OWL component
-([`home_dashboard.js`](static/src/js/home_dashboard.js) + [`home_dashboard.xml`](static/src/xml/home_dashboard.xml));
-all data comes from a single RPC into the `bluenova.theme.dashboard` **AbstractModel**
-([`models/theme_dashboard.py`](models/theme_dashboard.py)) — an abstract model on purpose, because
-the dashboard stores nothing.
+**Core colours** — Primary, Background, Text, Muted Text, Text Hover, Button,
+Button Text.
+**Top Bar** — background, text, and the search box (text, placeholder, border,
+background).
+**Sidebar Base** — sidebar background.
+**Active Menu** — the highlight on the app currently open.
+**Home Page colours** — the public hero's headline and standfirst colours.
+**Semantic colours** — Info, Success, Warning, Danger. Deliberately
+scheme-agnostic (a danger red stays a danger red), so these have no dark twin
+and are emitted into *both* schemes.
 
-| Region | What it shows |
-| --- | --- |
-| **Hero cards** | The two largest figures, on the brand gradient, with a 30-day-vs-previous-30-day trend line where there is a baseline to compare against (absent, not `+0.0%`, when there is not) |
-| **Metric cards** | The remaining figures — open opportunities, quotations, RFQs, posted customer invoices, open tasks, transfers to process, active employees — each with a seven-day sparkline, and IN/OUT pills on Transfers |
-| **Trend chart** | A column per day over the last 30 days, **one app at a time**; chips above the plot switch between the apps that saw activity, and hovering a column reads out that day |
-| **Recent activity** | The four newest records across everything the user can read; a row opens that record |
-| **Quick actions** | "New …" shortcuts, one per model the user may **create**, plus Settings for an administrator |
-| **Preview** | The user's own open tasks — falling back to their pipeline, then their quotations — with *View All* into the underlying action |
-| **Chat launcher** | A floating bubble; see §2.6 |
+### Feature toggles
 
-**The chart is hand-rolled, not a charting library.** Geometry is computed in
-`home_dashboard.js` (`chartMax`, `chartBars`, `chartTicks`, `chartAxis`) and handed to the template
-as percentages, so bars are laid out by the CSS grid in
-[`home_dashboard.scss`](static/src/scss/home_dashboard.scss) and reflow with the panel. Only one
-series is plotted at a time — "quotations created" and "transfers created" are counts of different
-things and would need two y-scales.
-
-Throughout:
-
-- a card, panel or row is **dropped silently** if its model is not installed or the current user
-  cannot read it, so every region degrades on its own and a bare database falls through to a written
-  empty state;
-- records are counted **as the current user**, never `sudo()`, so record rules apply exactly as they
-  do in the underlying list view;
-- every colour is a `--cmt-*` token — including the hero gradients, derived from the brand ramp — so
-  the page follows whatever is picked under Settings, in both schemes;
-- anything counted **by creation date** (the hero trend, the sparklines, the chart, the activity
-  feed) is counted against a tile's `history` domain rather than its needs-attention `domain`, so a
-  quotation confirmed since it was written stays in the history it belongs to. Without that split,
-  older buckets come back systematically emptier and the chart sags left while the trend reports
-  growth on a database where nothing changed;
-- it can optionally be set as the page a user lands on right after login
-  ([`controllers/main.py`](controllers/main.py) hooks `Home._login_redirect`, and only when super()
-  returned the default `/odoo` — an explicit `?redirect=`, a portal user's landing page, or a 2FA
-  interstitial is passed through untouched).
-
-### 2.5 Settings → Theme Settings
-
-A full panel ([`views/res_config_settings_views.xml`](views/res_config_settings_views.xml), backed by
-[`models/res_config_settings.py`](models/res_config_settings.py)) that recolours the theme without an
-SCSS edit or an asset rebuild.
-
-- **Colour pickers** for the core palette, top bar, search box, sidebar, active-app highlight, the
-  semantic colours (info / success / warning / danger) and the auth pages — each with a separate
-  dark-mode counterpart where the surface needs one.
-- **Primary repaints the whole brand family, not one token.** Hover/pressed fills, the active-row and
-  list-hover wash, focus rings, the sidebar app-icon tints, the accent family behind the hero
-  gradients and kanban washes, and Bootstrap's own `--bs-primary` / `--bs-link-color` — which paint
-  Odoo's badges, links, progress bars and pagination. All derived at page load by
-  [`models/theme_color.py`](models/theme_color.py), **in HSL** so the hue holds and the ramp stays
-  coordinated for any brand (mixing toward black desaturates, turning a vivid green into a muddy
-  olive at the hover state).
-- **Background drives the neutrals the same way.** A pick re-derives the whole neutral ramp —
-  surfaces, hairlines, scrollbars, ink, `--cmt-bg-rgb` — plus Bootstrap's `:root` neutrals and a
-  conditional tint layer for the surfaces Odoo compiles from Sass literals. The ramp **flips
-  direction on a dark pick**: choose a near-black canvas for light mode and the ink goes light with
-  it. How far panels travel toward the canvas scales with how much colour is in it.
-- **Fitted to reproduce the shipped theme exactly.** Fed `#f8f9fa` the ramp reproduces
-  `variables.scss`; fed `#0b1120` it reproduces `dark_mode.scss`. A picker still holding the value it
-  shipped with is treated as *unset* rather than as a choice, so an untouched install is byte-for-byte
-  the theme as designed.
-- **`brand_bridge.scss` covers core's compiled literals by role.** Core spells its brand six ways
-  (`$o-brand-primary`, `$o-action`, `$o-brand-odoo`, `$o-enterprise-action-color`, `$primary`,
-  `$o-component-active-bg`) and derives washes from them inline with `mix()` / `tint-color()` /
-  `rgba()` — none of it reachable from a custom property.
-  [`brand_bridge.scss`](static/src/scss/brand_bridge.scss) collapses all of it onto the theme's own
-  tokens by role, covering selection surfaces, links, focus rings, form fields, the kanban and
-  **calendar** renderers, the properties and colour-picker widgets, Discuss/chatter, and the loading
-  indicator.
-- **Uploadable images** — a sidebar brand image and a login background image (light and dark), stored
-  as `ir.attachment` records rather than `ir.config_parameter`, so no base64 payload rides along on
-  every request.
-- **Hero typography controls** (title/lead size and weight) for the public home page, emitted on a
-  bare `:root` because a type scale is not part of a palette.
-- **Export / Import / Reset** — download the palette as a JSON preset, re-import it later (validated
-  field-by-field by [`wizard/theme_import_wizard.py`](wizard/theme_import_wizard.py) before anything
-  is written), or reset to the compiled defaults in one click.
-- **Every colour is validated twice** — against a strict hex/`rgb()`/`rgba()` pattern on save *and*
-  again before it is rendered, because the value is interpolated into a `<style>` block served to
-  every user and nothing guarantees the stored row came through `set_values()` rather than a shell
-  session or a data file.
-- Changes apply on save via a page reload — no asset-bundle rebuild, no server restart.
-
-### 2.6 Chat / communication
-
-A floating chat launcher on the dashboard
-([`chat_launcher.js`](static/src/js/chat_launcher.js) + [`chat_launcher.xml`](static/src/xml/chat_launcher.xml),
-server side in `get_chat_threads` / `get_chat_messages` / `post_chat_message`).
-
-**This is a functional chat, not a mock-up or a static UI.** It reads and writes real
-`discuss.channel` data:
-
-- the **conversation list** shows the channels the user has pinned in Discuss — the same rows, in the
-  same order (`last_interest_dt desc`), with the last message preview, relative time and unread count;
-- picking a row opens that **conversation inside the card**: its recent messages (up to 30, oldest
-  first), authors and avatars, self/other bubble sides;
-- the **composer posts into the channel** via `message_post` with `message_type="comment"`. Because
-  that runs `mail_bot` in the same transaction, OdooBot's reply is already written by the time the
-  server hands the thread back — question and answer arrive in one round trip;
-- **new messages arrive live** over `bus_service` (`discuss.channel/new_message`), while the panel is
-  open;
-- opening a conversation **marks it read**, exactly as opening it in Discuss does;
-- *Open Discuss* in the header hands over to the real Discuss client action, on the open conversation.
-
-**What it deliberately is not:** attachments, mentions, reactions, message editing, sub-threads and
-typing indicators are not implemented. Those are Discuss, they are one click away, and each is a
-component this file would have to reimplement against `@mail/…` imports it must not take.
-
-**It requires Discuss and is absent — not disabled — without it.** The theme depends only on `web`
-and `base_setup`, so nothing in it imports from `@mail/…`: importing a module that is not in the
-bundle takes the *whole backend bundle* down rather than costing one feature. Everything mail-shaped
-is reached by name at runtime instead — the client asks the actions registry whether
-`mail.action_discuss` is registered, `bus_service` is looked up in `env.services` rather than through
-`useService`, and the three server methods are guarded by the same "model exists + user may read"
-pair as every dashboard tile.
-
-**Authorisation.** Reading and posting are gated on one question, asked as the current user: does
-this user have a `discuss.channel.member` row for this conversation? That is the same search
-Discuss's own controllers run. It is what lets the post itself use `sudo()` — the elevation covers
-the rows an ordinary member cannot write directly (the message, their seen pointer, the channel's
-`last_interest_dt`), not the decision about whether they may. Message bodies are `html_sanitize`d on
-the way out and posted text goes through `plaintext2html`, capped at 4000 characters.
-
-### 2.7 Calendar
-
-**BlueNova does not add a calendar view, a calendar component, or a calendar action.** Odoo 19's own
-calendar view — a FullCalendar **v6** renderer — is used unchanged, with all of its own day / week /
-month / year scales, filters, drag-and-drop and quick-create intact.
-
-What the theme contributes is **styling of that standard view**, in three places:
-
-1. **Dark mode** ([`dark_mode.scss`](static/src/scss/dark_mode.scss), ~180 lines). FullCalendar v6
-   exposes a `--fc-*` custom property set that v4 lacked, so the palette is remapped at the source —
-   `--fc-page-bg-color`, `--fc-border-color`, `--fc-neutral-bg-color`, `--fc-highlight-color`,
-   `--fc-non-business-color`, `--fc-more-link-*`, `--fc-now-indicator-color` — rather than chased
-   surface by surface. A handful of v6 surfaces that ignore those properties (the all-day strip,
-   disabled/weekend cells, week numbers, the time-grid divider, column headers, list-view rows, the
-   "+N more" popover) are restated by hand.
-2. **Brand colour** ([`brand_bridge.scss`](static/src/scss/brand_bridge.scss)) — the dropdown option,
-   the "+N more" link, the month/year A/B toggle, and the ghost event and drag mirror while an event
-   is being dragged.
-3. **Settings-driven tints** ([`res_config_settings.py`](models/res_config_settings.py)) — the
-   calendar sidebar, disabled cells, week numbers, scroller and popover surfaces follow a picked
-   Background through the conditional light-mode tint layer.
-
-Anything beyond that — event card layouts, custom scales, extra calendar sections — is **not
-implemented**, and this documentation does not claim it.
-
-### 2.8 Card-based UI components
-
-The card is the theme's main layout primitive. Every card below exists in the source:
-
-| Card | Where | What it carries |
+| Setting | Default | Effect |
 |---|---|---|
-| **Hero card** | Dashboard band 1 | Brand-gradient card, app glyph, label chip, large figure, trend line or subtitle |
-| **Metric card** | Dashboard band 2 | Masked app icon, label, figure, seven-day sparkline, and either IN/OUT pills or a subtitle |
-| **Activity card** | Dashboard band 1 | Panel of newest records — icon, "New *kind*: *name*", relative time; a row opens the record |
-| **Chart panel** | Dashboard band 3 | Series chips, running total, gridlines with y-ticks, day columns with hover tooltips, three-label x-axis |
-| **Quick-action card** | Dashboard band 4 | Icon + "New …" label, one per creatable model |
-| **Preview card** | Dashboard band 4 | The user's own open work — marker, name, secondary line — with *View All* |
-| **Chat card** | Floating, bottom-right | Header with back/open/close, conversation rows or message bubbles, auto-growing composer |
-| **Workspace card** | Sidebar header | Active company and database |
-| **Kanban card** | Odoo's kanban views | Glassmorphic fill with an accent spine — a restyle of Odoo's own card, not a replacement ([`kanban.scss`](static/src/scss/kanban.scss)) |
+| **Themed Public Home Page** | Off | Serves the theme's own page at `/` for anonymous visitors. Stands down automatically when `website` is installed. |
+| **Open Dashboard After Login** | Off | Lands internal users on the themed dashboard instead of `/odoo`. Only rewrites the *default* landing URL — deep links, portal redirects and 2FA interstitials pass through untouched. |
+| **Use Brand Image As Login Logo** | Off | Serves the stored brand image as the login logo instead of the company logo. |
 
-Every one of them is built from `--cmt-*` tokens and therefore follows the Settings palette in both
-colour schemes.
+Every boolean on this screen defaults to **off** by design:
+`ir.config_parameter.set_param` deletes the row when handed `False`, so a
+`config_parameter` boolean that defaulted to `True` could never be switched off.
 
-### 2.9 Themed login, signup and public pages
+### Hero typography bounds
 
-- The login, signup and reset-password screens pick up the same palette, plus an optional brand logo
-  and a tagline set from Settings ([`views/auth_theme.xml`](views/auth_theme.xml),
-  [`auth_pages.scss`](static/src/scss/auth_pages.scss)).
-- They **keep that styling when the `website` module is installed**. `website` replaces the whole
-  `web.login_layout` body with its own layout, which would otherwise drop the theme's card, logo and
-  body class; this module's inherit runs at priority 30, after website's 20, and rebuilds the themed
-  layout either way. The website header and footer stay off these three pages — remove the
-  `no_header` / `no_footer` lines in `auth_theme.xml` to keep them.
-- An **optional themed public page at `/`** for anonymous visitors ([`views/public_home.xml`](views/public_home.xml)).
-  Off by default, and it stands down automatically when `website` is installed, since that module
-  owns `/` properly. It is served by an override of `Home.index` that checks four conditions in
-  order: a database is resolved, nobody is logged in, the admin turned it on, and `website` is absent.
-
-### 2.10 Responsive behaviour
-
-Implemented in [`static/src/scss/responsive.scss`](static/src/scss/responsive.scss) (573 lines), and
-verifiable there:
-
-| Query | Purpose |
+| Field | Range |
 |---|---|
-| `min-width: 1600px` | Wide-screen layout — the dashboard grids gain columns |
-| `max-width: 1199.98px` | Below `xl` |
-| `max-width: 991.98px` | Below `lg` — tablet |
-| `max-width: 767.98px` | Below `md` — the app rail steps aside for Odoo's own slide-in menu |
-| `max-width: 575.98px` | Below `sm` — phone |
-| `max-height: 500px and (orientation: landscape)` | Short landscape viewports |
-| `hover: none` / `pointer: coarse` | Touch devices — hover-only affordances and larger hit areas |
-| `prefers-reduced-motion: reduce` | Motion is dropped for users who ask for it |
-| `print` | Print stylesheet |
+| Title Size / Lead Size | 8–200 px |
+| Title Weight / Lead Weight | 100–900 |
 
-The breakpoints mirror Bootstrap's, which is what Odoo 19 itself uses.
+An emptied input (`0`) means *unset* — the shipped default takes over. Anything
+outside the range is rejected on save with a clear error, so a fat-fingered
+600px headline never reaches a stylesheet.
 
----
+### Images
 
-## 3. Screenshots / Preview
+Three images are stored as `ir.attachment` records (filestore), **not** as
+config parameters — a base64 PNG in `ir.config_parameter` would be dragged into
+nearly every request:
 
-The module currently ships **two images**, both real files in
-[`static/description/`](static/description/):
-
-### Banner
-
-![BlueNova Backend Theme banner](static/description/banner.png)
-
-### App icon
-
-![BlueNova app icon](static/description/icon.png)
-
-> **No UI screenshots are bundled yet.** Rather than reference filenames that do not exist, the
-> screenshots that *should* be captured are listed below. Add them under
-> `static/description/screenshots/` and they can then be linked from this section and from
-> `static/description/index.html`.
->
-> | Suggested file | What to capture |
-> |---|---|
-> | `dashboard-light.png` | The `bluenova_dashboard` landing page in light mode — heroes, metric cards, chart, quick actions |
-> | `dashboard-dark.png` | The same page with `data-cmt-theme="dark"` |
-> | `sidebar.png` | The app rail open, with an app active, next to the navbar toggle |
-> | `chat-launcher.png` | The floating chat panel, conversation list and an open thread |
-> | `theme-settings.png` | Settings → Theme Settings, with the colour pickers and Export/Import/Reset |
-> | `calendar-dark.png` | Odoo's standard calendar view under the theme's dark palette |
-> | `kanban.png` | A kanban board with the glassmorphic card restyle |
-> | `login.png` | The themed login page, with logo and tagline |
-> | `responsive.png` | The backend at a phone width, with Odoo's slide-in menu in place of the rail |
-
----
-
-## 4. Technical Architecture
-
-```
-bluenova_backend_theme/
-├── __init__.py                        # imports controllers, models, wizard
-├── __manifest__.py                    # depends, data, asset-bundle registration
-├── README.md
-├── README.rst
-├── controllers/
-│   └── main.py                        # opt-in login-redirect & public-home hooks on web.Home
-├── models/
-│   ├── res_config_settings.py         # Theme Settings fields, validation, runtime CSS, presets
-│   ├── theme_color.py                 # HSL colour maths: brand, accent and neutral ramps
-│   └── theme_dashboard.py             # AbstractModel behind the dashboard + chat RPCs
-├── wizard/
-│   ├── theme_import_wizard.py         # validates & applies an uploaded JSON preset
-│   └── theme_import_wizard_views.xml
-├── security/
-│   └── ir.model.access.csv            # ACL for the transient import wizard only
-├── views/
-│   ├── theme_styles.xml               # renders the saved palette into the backend page head
-│   ├── auth_theme.xml                 # login / signup / reset-password styling & branding
-│   ├── public_home.xml                # optional themed page at `/`
-│   ├── home_dashboard_actions.xml     # dashboard client action + root menu
-│   └── res_config_settings_views.xml  # the Theme Settings panel
-└── static/
-    ├── description/                   # app card: icon.png, banner.png, index.html
-    └── src/
-        ├── fonts/                     # Inter + Poppins, latin subset (OFL 1.1)
-        ├── image/icons/               # 62 bundled single-colour app icons
-        ├── scss/
-        │   ├── primary_variables.scss # PREPENDED to web._assets_primary_variables
-        │   ├── variables.scss         # ← every design token lives here
-        │   ├── fonts.scss             # @font-face, bundled not CDN
-        │   ├── base.scss              # canvas, scrollbars, shared mixins
-        │   ├── navbar.scss            # top bar, via --NavBar-* properties
-        │   ├── apps_sidebar.scss
-        │   ├── control_panel.scss
-        │   ├── kanban.scss
-        │   ├── stats_banner.scss      # loaded, but its component is dormant — see below
-        │   ├── home_dashboard.scss
-        │   ├── chat_launcher.scss
-        │   ├── settings_page.scss
-        │   ├── buttons_misc.scss
-        │   ├── brand_bridge.scss      # core's compiled brand literals → var(--cmt-*)
-        │   ├── responsive.scss        # device rules; after every desktop rule above
-        │   ├── dark_mode.scss         # LAST; overrides every backend surface above
-        │   ├── auth_pages.scss        # login / signup / reset (frontend bundle)
-        │   └── public_home.scss       # the public `/` page (frontend bundle)
-        ├── js/
-        │   ├── theme_mode.js              # light/dark reactive store + <html> attribute
-        │   ├── apps_sidebar_state.js      # open/closed rail reactive store
-        │   ├── apps_sidebar.js            # the rail component + icon mapping
-        │   ├── apps_sidebar_patch.js      # WebClient.components + NavBar toggle handler
-        │   ├── chat_launcher.js           # floating chat panel
-        │   └── home_dashboard.js          # dashboard client action
-        └── xml/
-            ├── apps_sidebar.xml           # AppsSidebar + WebClient/NavBar inherits
-            ├── home_dashboard.xml         # HomeDashboard
-            └── chat_launcher.xml          # ChatLauncher
-```
-
-### Directory purposes
-
-| Path | Purpose |
+| Attachment name | Used for |
 |---|---|
-| `controllers/` | Two opt-in overrides on `web`'s own `Home` controller. Both fall through to the original behaviour when their setting is off. |
-| `models/` | The Settings screen and its colour arithmetic, plus the dashboard/chat data layer. None of the three defines a stored table. |
-| `wizard/` | The transient model behind Import Preset. |
-| `security/` | One ACL row, for that transient model. There is nothing else to grant access to. |
-| `views/` | QWeb templates and records. `theme_styles.xml` is the one that injects the runtime palette. |
-| `static/src/scss/` | The stylesheets, in a load order the manifest documents inline and depends on. |
-| `static/src/js/` | OWL 2 components and two module-level `reactive()` stores. |
-| `static/src/xml/` | OWL templates, plus `t-inherit` extensions of `web.WebClient` and `web.NavBar`. |
+| `bluenova_backend_theme.sidebar_brand_image` | Login logo, when *Use Brand Image As Login Logo* is ticked |
+| `bluenova_backend_theme.login_background_image` | Login background (light) |
+| `bluenova_backend_theme.login_background_image_dark` | Login background (dark) |
 
-### <a name="dormant-code"></a>Dormant code
-
-**None.** Every file in the tree is registered in the manifest and reaches the browser or the ORM.
-
-This section used to list six unregistered files. They were removed before the Odoo Apps Store
-submission, because shipping code that is never loaded is a review liability rather than a feature:
-
-| Removed | Why |
-|---|---|
-| `static/src/js/crm_pipeline_stats.js`, `crm_pipeline_stats_patch.js`, `static/src/xml/crm_pipeline_stats.xml` | A CRM pipeline stat banner. The patch imported `@crm/views/crm_kanban/crm_kanban_renderer`; an import of a module absent from the bundle is a load-time failure of the **whole** backend bundle, so enabling it without adding `crm` to `depends` produced a blank web client rather than a missing banner. |
-| `views/crm_lead_views.xml` | A CRM kanban card restyle, xpath-ing into `crm.crm_case_kanban_view_leads` — a view from a module this theme does not depend on. |
-| `views/assets.xml` | Odoo 13/14-era asset-bundle templates, superseded by the manifest `assets` dict in 15.0+. It also referenced `odoo13_compat.scss`, which does not exist, so loading it could only ever fail. |
-| `static/src/js/shared_state.js` | An OWL 1 subscription helper (`const { hooks } = owl`) that would throw under OWL 2. Superseded by `reactive()` in `apps_sidebar_state.js` and `theme_mode.js`. |
-
-`stats_banner.scss` and the `.o_cmt_card_*` blocks in `kanban.scss` / `responsive.scss` were
-deliberately **left in place**. They are inert CSS selectors that match no markup, they cost about
-2&nbsp;KB in a ~950&nbsp;KB bundle, and stripping them would mean editing two working stylesheets
-for no functional gain.
+They are served through `/web/image/<id>?unique=<timestamp>`, so replacing an
+image busts the browser cache automatically. The attachments are created with
+`public: True` — the login page has no authenticated user to read them
+otherwise.
 
 ---
 
-## 5. Odoo Integration
+## Presets: export, import, reset
 
-The theme integrates through Odoo 19's supported extension points only. **No Odoo core file is
-modified.**
+**Export Settings** downloads `bluenova_theme_settings.json`: a small, diffable,
+committable file describing the *whole* palette — both schemes plus the hero
+type scale. Images are deliberately excluded.
 
-### Manifest & dependencies
-
-```python
-'depends': ['web', 'base_setup']
-'application': True      # gets its own card under Apps, with an Activate button
-'auto_install': False    # dropping it in the addons path changes nothing until activated
-```
-
-Two dependencies, deliberately. `crm`, `mail`, `bus`, `sale`, `stock`, `project`, `hr`, `account`,
-`purchase` and `website` are all *optional* — every feature that touches them is guarded at runtime.
-
-### Asset bundles
-
-| Bundle | Contents |
-|---|---|
-| `web._assets_primary_variables` | `primary_variables.scss`, **prepended**. Core's own `primary_variables.scss` declares `$o-brand-primary` with `!default` and immediately derives a dozen variables from it; loading *after* it would win the assignment and lose every derivation. |
-| `web.assets_backend` | 17 SCSS files in a documented order (tokens → surfaces → brand bridge → responsive → dark mode), 6 JS modules, 3 QWeb template files. |
-| `web.assets_frontend` | 4 SCSS files only — `fonts`, `variables`, `auth_pages`, `public_home`. The login and public pages render through `web.frontend_layout`, a different bundle, so none of the backend stylesheets reach them. `dark_mode.scss` is deliberately excluded: it is written against backend DOM that does not exist there. |
-
-The SCSS load order is load-bearing and commented inline in the manifest — `home_dashboard.scss`
-must follow `apps_sidebar.scss` and `base.scss` for their mixins, `brand_bridge.scss` must follow
-every file that paints a surface itself, `responsive.scss` must follow every desktop rule, and
-`dark_mode.scss` must be last.
-
-### OWL components (Odoo 19 web framework)
-
-| Component | Registered as |
-|---|---|
-| `HomeDashboard` | `registry.category("actions").add("bluenova_dashboard", …)` — an OWL client action, which in Odoo 19 gets no control panel unless it renders one |
-| `AppsSidebar` | Added to `WebClient.components`, mounted by a `t-inherit` on `web.WebClient` |
-| `ChatLauncher` | A child component of `HomeDashboard` |
-
-All three use OWL 2 idioms: `useState`, `useService`, `useRef`, `useEffect`, `useExternalListener`,
-`onWillStart`, `onWillUnmount`, module-level `reactive()` stores, and `t-key` on every `t-foreach`.
-
-### View / template inheritance
-
-- `web.WebClient` — `<xpath expr="//NavBar" position="after">` adds `<AppsSidebar/>`, inside the same
-  `t-if` so both stand down in fullscreen mode.
-- `web.NavBar` — `<xpath expr="//t[@t-call='web.NavBar.AppsMenu']" position="after">` adds the rail
-  toggle button.
-- `NavBar.prototype` — patched with `@web/core/utils/patch` for the toggle handler and its pressed
-  state.
-- `res.config.settings` — a standard `_inherit`, with the panel added by an inherited form view.
-- `web.login_layout` and friends — inherited at priority 30 in `auth_theme.xml`.
-- `web.Home` — the controller is subclassed; `index` re-uses the parent routing with a bare
-  `@http.route()`.
-
-### The runtime CSS path
-
-Saved colours take a higher-priority path than the bundle. `views/theme_styles.xml` renders
-`_get_theme_css()`, `_get_theme_css_dark()` and `_get_theme_metrics_css()` as a small `<style>` block
-in the page `<head>`, **after** the compiled bundle, so it wins the cascade at equal specificity —
-and it is regenerated straight from `ir.config_parameter` on every page load, with no bundle rebuild.
-The light block is scoped `:root:not([data-cmt-theme="dark"])` and the dark block
-`:root[data-cmt-theme="dark"]`, so the two can never both match and neither has to outrank the other.
-`auth_theme.xml` and `public_home.xml` render the same blocks for the unauthenticated pages.
-
-### How underlying functionality is preserved
-
-- No Odoo view, model or controller is *replaced* — everything is an inherit, a patch, an
-  `xpath position="after"`, or a subclass calling `super()`.
-- The dashboard is a **signpost**, not a second place records are managed: every click hands over to
-  the owning app's own action (`action.doAction`).
-- The app rail is built from `menuService.getApps()`, so it shows exactly the apps Odoo would.
-- All counts and reads run as the current user, so record rules and access rights apply unchanged.
-- The theme adds no field to any business model and no column to any table.
-
----
-
-## 6. Installation
-
-The technical name is **`bluenova_backend_theme`**, and the directory must be named exactly that —
-every asset path in the manifest is an absolute reference to it.
-
-1. **Copy the module into an addons directory** on your Odoo 19 server:
-
-   ```bash
-   cd /path/to/odoo/custom-addons
-   git clone https://github.com/NandiniGohel/odoo_theme_backend.git bluenova_backend_theme
-   ```
-
-   Make sure that directory is listed in `addons_path` in your `odoo.conf`.
-
-2. **Restart the Odoo service**, so the new module is picked up:
-
-   ```bash
-   ./odoo-bin -c odoo.conf
-   ```
-
-3. **Enable Developer Mode** — Settings → General Settings → Developer Tools → *Activate the developer
-   mode*. (Needed only to reach *Update Apps List*; skip it if the app is already listed.)
-
-4. **Update the Apps List** — Apps → ⋮ → *Update Apps List*.
-
-5. **Search for "BlueNova"** in Apps. The module is flagged `application: True`, so it gets its own
-   card rather than hiding behind the *Extra* filter.
-
-6. **Activate** it. It never installs itself (`auto_install: False`).
-
-7. **Refresh the backend** (a hard reload, `Ctrl`/`Cmd` + `Shift` + `R`) so the new asset bundle is
-   fetched.
-
-Or install from the command line:
-
-```bash
-./odoo-bin -c odoo.conf -d <database> -i bluenova_backend_theme
-```
-
-Then open **Settings → Theme Settings** to recolour, upload a brand image, or enable the landing
-dashboard and public home page.
-
-### While developing
-
-SCSS is compiled server-side and cached in `ir.attachment`. To see edits without restarting:
-
-```bash
-./odoo-bin -c odoo.conf --dev=all
-```
-
-Otherwise regenerate the bundles (Settings → Technical → Regenerate Assets Bundles) and hard-refresh.
-**Adding a new file to the manifest's `assets` dict requires a service restart**, not just a bundle
-regeneration.
-
----
-
-## 7. Requirements
-
-| | |
-|---|---|
-| **Odoo** | 19.0 |
-| **Edition** | Community Edition (see §8) |
-| **Python** | Whatever your Odoo 19 installation requires — the module adds **no** Python package dependency. It imports only from the standard library (`base64`, `colorsys`, `json`, `logging`, `re`, `datetime`) and from `odoo` / `markupsafe`, both already present in any Odoo install. There is no `external_dependencies` key in the manifest. |
-| **Odoo dependencies** | `web`, `base_setup` |
-| **Frontend dependencies** | **None.** No npm package, no CDN, no external font or script request. Fonts are bundled `woff2`; icons are bundled PNG/SVG; the dashboard chart is hand-rolled CSS, not a charting library. |
-| **Optional at runtime** | `mail` + `bus` (chat launcher), `crm` / `sale` / `purchase` / `account` / `project` / `stock` / `hr` (dashboard tiles), `website` (changes login-page and `/` behaviour). Every one of these is guarded — absent means the feature is absent, never broken. |
-| **Browser** | Any evergreen browser that Odoo 19 itself supports (see §8) |
-
----
-
-## 8. Compatibility
-
-### Odoo
-
-**Odoo 19.0 Community Edition** is the target this module is written and documented against. Every
-version-sensitive decision in the source is written for 19 specifically:
-
-- client actions are OWL components in the `actions` registry, not legacy `AbstractAction`s;
-- the web client is routed on real paths (`/odoo/action-42`), not on the hash fragment;
-- `has_access` is used rather than the `check_access_rights(..., raise_exception=False)` deprecated
-  in 18.0;
-- `Home` is imported from `odoo.addons.web.controllers.home` (split out of `main.py` in 16.0);
-- FullCalendar **v6** class names and `--fc-*` custom properties are used, not v4's;
-- `t-out` with `Markup` is used, not the `t-raw` removed in 15.0;
-- assets are declared in the manifest `assets` dict, not as XML bundle templates.
-
-Nothing in the module depends on an Enterprise-only module or feature — `depends` is `web` and
-`base_setup`, and `brand_bridge.scss` maps `$o-enterprise-action-color` only as one more compiled
-literal to redirect. **Enterprise has not been verified**, so no Enterprise claim is made here.
-
-Odoo versions **other than 19.0 are not supported**. The Odoo 13/14-era leftovers that used to sit
-in the tree have been removed — see [Dormant code](#dormant-code).
-
-### Browsers
-
-The theme adds no browser requirement beyond Odoo 19's own. It uses CSS custom properties, `grid`,
-`flex`, `mask-image`, `backdrop-filter` and `:is()` — all supported in current Chrome, Edge, Firefox
-and Safari. `backdrop-filter` is what produces the glassmorphic panels; where it is unsupported those
-surfaces fall back to a solid fill and remain fully legible.
-
-### Responsive
-
-Yes — and it is verifiable in [`responsive.scss`](static/src/scss/responsive.scss), which carries
-explicit rules for wide screens, `xl`/`lg`/`md`/`sm` breakpoints, short landscape viewports, touch
-pointers, reduced motion, and print. See §2.10 for the table.
-
-### Accessibility notes
-
-Click targets on the dashboard are real `<button>` elements, so they are keyboard-reachable for free.
-Decorative icons carry `aria-hidden`; the chart carries `role="img"` and a written summary rather
-than thirty focusable columns; the chat panel is a labelled `role="dialog"` with `Escape` stepping
-back one level at a time and returning focus to the button that opened it.
-
----
-
-## 9. Customization
-
-### 9.1 Recolour from the UI (recommended)
-
-**Settings → Theme Settings** covers every token that has a picker, with Export / Import / Reset built
-in — no code change and no asset rebuild. This is the intended path for per-instance branding. See
-§2.5.
-
-### 9.2 SCSS — the compiled defaults
-
-For anything without a picker, every visual decision is a token in
-[`static/src/scss/variables.scss`](static/src/scss/variables.scss):
-
-```scss
-:root {
-    --cmt-primary: #3959b0;          // brand + primary actions
-    --cmt-tertiary: #0284c7;         // accent: hero gradients, won washes, counters
-    --cmt-bg: #f8f9fa;               // the main canvas
-    --cmt-surface: #ffffff;          // cards, navbar, panels
-    --cmt-text: #111827;
-    --cmt-font-sans: 'Inter', …;
+```json
+{
+  "_module": "bluenova_backend_theme",
+  "_version": 1,
+  "colors": {
+    "theme_color_primary": "#3959b0",
+    "theme_color_primary_dark": "#7c9aff",
+    "theme_color_background": "#f8f9fa",
+    "...": "..."
+  },
+  "metrics": {
+    "theme_home_title_size": "59",
+    "theme_home_title_weight": "800",
+    "theme_home_lead_size": "15",
+    "theme_home_lead_weight": "500"
+  }
 }
 ```
 
-The dark palette is the same token set redeclared under `:root[data-cmt-theme="dark"]` in
-[`dark_mode.scss`](static/src/scss/dark_mode.scss) — edit the two blocks in parallel and both modes
-stay in step.
+**Import Settings** opens a file-picker wizard (`bluenova.theme.import.wizard`)
+that validates everything *before* writing anything — unreadable JSON, unknown
+keys, malformed colours and out-of-range numbers are each reported with a
+specific message, and a rejected preset leaves the live theme untouched. A key
+that is absent or empty is imported as *unset*, so a preset fully describes a
+theme rather than patching one.
 
-Three caveats:
+**Reset All Theme Settings** deletes every stored colour, metric, flag and
+uploaded image, returning the theme to the values compiled into the stylesheets.
 
-- Any token the Settings screen also exposes a picker for is **overridden at runtime** by a saved
-  value. The SCSS default is what a fresh install shows.
-- `--cmt-on-primary` — the ink on every brand fill (`.btn-primary`, the outline button's filled
-  states, the `Enterprise` pill, the hero card, the login action) — is **not** derived from Primary.
-  It stays the scheme's own: `#ffffff` in light, `#0b1120` in dark. Picking Primary moves fills, not
-  ink. Override it per scheme with the **Button Text** / **Button Text (Dark)** pickers, which is
-  also where to go if a deliberately pale Primary needs dark labels.
-- The brand *shades* (`--cmt-primary-dark/-light/-soft/-rgb`, `--cmt-on-primary-container`,
-  `--cmt-app-icon-hover/-active`) and the neutral ramp are the compiled defaults **until** Primary or
-  Background is picked, after which they are derived. `theme_color.py`'s multipliers are fitted to
-  reproduce `variables.scss` and `dark_mode.scss` exactly when fed the shipped values — so a
-  hand-edited default belongs in both places or in neither.
+Both import and reset finish with Odoo's `reload` client action, so the new look
+is on screen immediately.
 
-`$o-brand-primary` in [`primary_variables.scss`](static/src/scss/primary_variables.scss) is a
-**build-time** value and cannot follow a picker; it is what a fresh install compiles against. The
-runtime path to core's brand is Bootstrap's `:root` custom properties plus `brand_bridge.scss`.
+---
 
-### 9.3 Navigation — add an icon for your own app
+## The landing dashboard
 
-Drop a single-colour PNG/SVG on a transparent background into
-[`static/src/image/icons/`](static/src/image/icons/), then map it in
-[`static/src/js/apps_sidebar.js`](static/src/js/apps_sidebar.js) by the module part of the app's
-xmlid:
+An app in its own right (**Dashboard**, `sequence="1"`, so it sits first in the
+app rail) and optionally the post-login landing page.
 
-```js
-const ICON_BY_MODULE = {
-    my_module: "my-icon.svg",
-    // …
-};
+Data comes from `bluenova.theme.dashboard` — an `AbstractModel`, because the
+dashboard stores nothing, so there is no table and no ACL row to grant. **Every
+figure is counted as the requesting user, never `sudo`**, so record rules apply
+exactly as they do in the list view each tile links to: a salesperson's numbers
+and an accountant's numbers are each their own.
+
+One RPC (`get_dashboard_data`) builds six independent regions:
+
+| Region | Contents |
+|---|---|
+| `heroes` | The two largest figures, on gradient cards, with a 30-day-vs-previous-30-days trend line |
+| `tiles` | The remaining figures as metric cards, with a 7-day sparkline or a pair of status pills |
+| `chart` | A 30-day, one-bar-per-day column chart, up to 4 selectable series (one per app) |
+| `activity` | The newest records across everything readable ("New quotation: S00042 · 2h ago") |
+| `quick_actions` | "New …" shortcuts, one per creatable model |
+| `preview` | A short list of the user's *own* open work |
+
+Each region degrades to empty on its own. A database with only `web` installed
+gets the time-of-day greeting and an empty state.
+
+### Tiles shipped
+
+| App | Model | Figure |
+|---|---|---|
+| CRM | `crm.lead` | Open pipeline (opportunities) |
+| Sales | `sale.order` | Quotations awaiting confirmation |
+| Purchase | `purchase.order` | RFQs not yet ordered |
+| Invoicing | `account.move` | Posted customer invoices |
+| Project | `project.task` | Tasks still open (via `stage_id.fold`, so it follows the manager's own configuration) |
+| Inventory | `stock.picking` | Transfers to process, split IN / OUT |
+| Employees | `hr.employee` | Currently active |
+
+Preview panel candidates, in preference order: **my open tasks → my pipeline →
+my quotations** — first one that is installed, readable and non-empty wins.
+
+Every domain is the *needs-attention* slice rather than a grand total (a number
+that never changes is not worth a card). Historical series use a separate,
+state-free `history` domain — counting "still draft" backwards through time
+would drop older records in proportion to their age and bend every chart the
+same way.
+
+---
+
+## The chat bubble
+
+A floating button on the dashboard opens a two-view card:
+
+- **list** — the user's Discuss conversations, in Discuss's own order, with the
+  last message under each name (8 rows).
+- **thread** — one conversation: its last 30 messages and a working composer.
+
+Messages are posted as real `message_type="comment"` comments, which means
+**OdooBot answers** (`mail_bot._apply_logic` runs in the same transaction) and
+new messages arrive live over the bus. "Open Discuss" hands over to the real
+application, on the open conversation when there is one.
+
+What it is not: attachments, mentions, reactions, editing, sub-threads or typing
+indicators. Those are Discuss, one click away.
+
+The bubble renders **only where Discuss is installed** — and `mail` is still not
+a dependency. Nothing imports from `@mail/…` (an import of a module absent from
+the bundle would blank the *entire* backend, not just hide a feature).
+Availability is answered by asking the actions registry whether Discuss's client
+action is registered; live updates come from `bus_service` looked up in
+`env.services`, simply absent where it is not installed. Posted bodies are
+capped at 4000 characters as a guard on the RPC entry point.
+
+---
+
+## Authentication pages
+
+Login, signup and reset-password are all themed from a single inherit of
+`web.login_layout` (the one template all three `t-call`), which is why
+`auth_signup` is not a dependency — if it happens to be installed, its pages
+pick the styling up for free.
+
+The inherit **replaces the layout's `t-call` child at priority 30**,
+deliberately mirroring what `website` does at priority 20. Without that, an
+instance with `website` installed silently lost the theme on the login screen:
+website's `replace` takes out core's entire card subtree, `o_bluenova_auth_page`
+never reaches `<body>`, and every rule in `auth_pages.scss` is scoped to a class
+that is no longer on the page. Both structures now end in the same place, and
+the login screen looks identical with or without `website`.
+
+Also on these pages:
+
+- Dark mode honoured **before first paint**, from the same `localStorage` key
+  the backend writes — set by a tiny inline script, because the frontend JS
+  bundle is deferred and would land after the page was already painted light.
+- Optional per-scheme background image, optional brand-image logo, optional
+  tagline.
+- `no_header` / `no_footer` stay `True`, so a website's chrome does not appear
+  around them.
+
+---
+
+## The optional public home page
+
+A themed page at `/` for anonymous visitors, built on `web.frontend_layout` —
+which is why it costs no new dependency and no new asset bundle.
+
+It takes over only when **all four** conditions hold, in order:
+
+1. a database is resolved (`/` is reachable before `ensure_db()` has ever run);
+2. nobody is logged in (a signed-in user hitting `/` still wants the web
+   client);
+3. the admin switched it on (silently changing what `/` serves on a running
+   instance is not a theming decision);
+4. `website` is **not** installed — that module owns `/` properly, with an
+   editable page behind it, so the theme stands down.
+
+The honest trade-off: there is no drag-and-drop editing here. The copy is the
+company's own data plus the tagline from Theme Settings. Anything richer is what
+`website` is for.
+
+---
+
+## How the theming works
+
+Four layers, each solving a problem the one before it cannot reach.
+
+### 1. Sass brand variables — build time
+
+`static/src/scss/primary_variables.scss` is **prepended** to
+`web._assets_primary_variables`, not appended. Core's own
+`primary_variables.scss` declares `$o-brand-primary` and friends with
+`!default` and then derives a dozen variables from them on the spot; loading
+after it would win the assignment and lose every derivation.
+
+### 2. Design tokens — the `--cmt-*` custom properties
+
+`static/src/scss/variables.scss` declares the whole palette on `:root`, and
+every other stylesheet in the module reads tokens rather than literals. The dark
+scheme is one attribute on `<html>` (`data-cmt-theme="dark"`) that
+`dark_mode.scss` keys on — set on the *document* element so dialogs, popovers
+and tooltips appended to `<body>` are covered too.
+
+### 3. Runtime CSS — the settings screen
+
+Saved colours are rendered as a `<style>` block into the page head:
+
+- backend — `views/theme_styles.xml`, appended to `head_web` in
+  `web.webclient_bootstrap`, so it lands **after** every compiled bundle and
+  wins the cascade at equal specificity;
+- login/signup/reset — `views/auth_theme.xml`;
+- public home — `views/public_home.xml`.
+
+Rendered on every page load straight from `ir.config_parameter`, so a save is on
+screen the moment the page comes back: **no bundle rebuild, no restart, nothing
+cached to invalidate.** When nothing has been customised the methods return `""`
+and an untouched install carries no extra markup at all.
+
+The three blocks are scoped so they can never fight:
+
+| Block | Selector |
+|---|---|
+| Light colours | `:root:not([data-cmt-theme="dark"])` |
+| Dark colours | `:root[data-cmt-theme="dark"]` |
+| Hero type scale | bare `:root` (a type scale is not part of a palette and must survive the dark switch) |
+
+**Security:** every colour is matched against
+`^(#[0-9A-Fa-f]{3,8}|rgba?\([\d\s.,%]+\))$` before it is written *and* the
+metrics are range-checked, at both entry points (settings save and preset
+import). Without that, an admin-only CSS injection is one hop away — `#fff; }
+html { display: none } :root {` is a defacement, and a `url()` is an outbound
+request carrying the user's referrer. Values are returned as
+`markupsafe.Markup` so `t-out` emits them unescaped, which is safe precisely
+because of the validation above.
+
+### 4. Colour derivation — `models/theme_color.py`
+
+A brand colour is not one value, it is a *family*. Picking a Primary re-derives:
+
+- the theme's own ramp — `--cmt-primary-dark` (hover/pressed),
+  `--cmt-primary-light` (active rows, list hover), `--cmt-primary-soft` (focus
+  rings), `--cmt-on-primary-container`, `--cmt-primary-rgb`;
+- the **accent** family — held to the brand's own hue, moving only lightness and
+  saturation, because rotating the hue is exactly how a violet brand ends up
+  with a blue dashboard hero;
+- the **sidebar icon rail's** hover/active tints;
+- **Bootstrap's `:root` brand variables** — `--primary`, `--link-color-rgb`,
+  `--primary-bg-subtle` and friends, emitted in *both* the prefixed (`--bs-*`)
+  and unprefixed spellings, because Odoo compiles Bootstrap with
+  `$variable-prefix: ''` and emitting one spelling would make the whole block
+  inert, silently, on half the versions this theme supports.
+
+Picking a Background derives the full neutral ramp — surface, dim, highest,
+border, scrollbar thumb, outline, muted text, ink, the glass fills and
+Bootstrap's neutrals — anchored on *paper* (the lightest surface) rather than on
+the canvas, so a mid-green canvas still gets a near-white sheet, a hairline a
+shade under it and readable ink. The ramp direction follows the *picked colour*,
+not which block is being emitted, so a dark colour chosen as the light scheme's
+Background correctly flips the ink and lifts the surfaces.
+
+Two design commitments worth knowing:
+
+- **Work in HSL, not channel mixing.** Mixing toward black desaturates as it
+  goes, turning a vivid green into muddy olive at the hover state.
+- **An untouched install must be byte-identical to what it was.** The
+  multipliers are *fitted*: fed `#3959b0` they reproduce `variables.scss`
+  exactly; fed `#7c9aff` and `#0b1120` they reproduce `dark_mode.scss` exactly.
+  Where a family cannot be fitted (the accent's shipped 24° hue rotation), the
+  derivation is **skipped entirely** while the picker still holds its shipped
+  value.
+
+Two consequences of the same principle, both intentional:
+
+- A picker still holding the value it shipped with is treated as *the absence of
+  a choice*, not a choice — it is emitted as the alias `variables.scss` declares
+  for it, so picking a green Primary also moves the Save button, the active app
+  and the login action instead of leaving them frozen indigo.
+- The light scheme gets a conditional **tint layer** (mirroring
+  `dark_mode.scss`'s "Layer 3") rendered from Python only when a Background has
+  actually been picked. Odoo compiles many surfaces from Sass literals no custom
+  property can reach; a permanent rule in the bundle would repaint an untouched
+  install, so the block only exists once someone has picked a canvas.
+
+---
+
+## Module layout
+
+```
+bluenova_backend_theme/
+├── __manifest__.py                     # deps, data, asset bundles (heavily annotated)
+├── controllers/
+│   └── main.py                         # BlueNovaHome: post-login landing + public `/`
+├── models/
+│   ├── res_config_settings.py          # the settings screen, runtime CSS, presets
+│   ├── theme_color.py                  # HSL colour derivation (brand, accent, neutrals)
+│   └── theme_dashboard.py              # bluenova.theme.dashboard + chat RPCs
+├── wizard/
+│   ├── theme_import_wizard.py          # validating JSON preset importer
+│   └── theme_import_wizard_views.xml
+├── security/
+│   └── ir.model.access.csv             # import wizard, base.group_system only
+├── views/
+│   ├── theme_styles.xml                # runtime <style> into the backend head
+│   ├── auth_theme.xml                  # login / signup / reset layout (priority 30)
+│   ├── public_home.xml                 # the optional page at `/`
+│   ├── home_dashboard_actions.xml      # client action + app menu
+│   └── res_config_settings_views.xml   # Settings › Theme Settings
+└── static/
+    ├── description/                    # Apps Store icon, banner, index.html, screenshots, videos
+    └── src/
+        ├── fonts/                       # Inter + Poppins (woff2, latin subset) + OFL.txt
+        ├── image/icons/                 # ~80 single-colour app icons
+        ├── js/
+        │   ├── theme_mode.js            # light/dark reactive store + <html> attribute
+        │   ├── apps_sidebar_state.js    # open/closed reactive store
+        │   ├── apps_sidebar.js          # the AppsSidebar component
+        │   ├── apps_sidebar_patch.js    # mounts it on WebClient, patches NavBar
+        │   ├── home_dashboard.js        # the HomeDashboard client action
+        │   └── chat_launcher.js         # the floating chat panel
+        ├── scss/                        # 18 stylesheets — see the load-order note below
+        └── xml/                         # OWL templates for the three components
 ```
 
-Matching on the module rather than the display name keeps the mapping working in every language. Use
-`ICON_BY_XMLID` when one module owns several app menus, and `ICON_BY_NAME` for an app installed
-without an xmlid. Anything unmatched falls back to `custom.png`.
+### SCSS load order (from `__manifest__.py`)
 
-Adding a *file* to the icons directory needs no manifest change (it is served from `static/`), but it
-does need a browser refresh.
+Order is load-bearing and the manifest documents why for each entry:
 
-### 9.4 Dashboard — add a tile
+```
+fonts → variables → base → navbar → apps_sidebar → control_panel → kanban
+  → stats_banner → home_dashboard → chat_launcher → settings_page
+  → buttons_misc → brand_bridge → responsive → dark_mode
+```
 
-Tiles are plain data in the `_TILES` list in
-[`models/theme_dashboard.py`](models/theme_dashboard.py) — model, label, singular noun, subtitle,
-icon, domain and the action to open on click, plus optional `pills` for an IN/OUT breakdown. A new
-entry inherits the same access and `try/except` guards, so a tile for a model that is not installed,
-or that the viewing user cannot read, is dropped rather than shown broken.
+- `home_dashboard.scss` must follow `apps_sidebar.scss` and `base.scss` — it
+  uses mixins they define, and a bundle compiles as one SCSS document.
+- `brand_bridge.scss` comes after every component stylesheet. It is what makes
+  the Primary picker work in *light* mode: dark mode already restates core's
+  surfaces in `--cmt-*` tokens, but core's light surfaces are compiled literals
+  baked from `$o-brand-primary` at build time, which no runtime custom property
+  can reach. Drop it and the picker silently works in one scheme only.
+- `responsive.scss` is second-to-last (every file above it states the desktop
+  case), and `dark_mode.scss` is last (it only swaps colour and must keep
+  winning at every size).
 
-One entry feeds five regions: it is a candidate for a hero card (the two largest figures win), a
-metric card, a series on the chart, the activity feed, and a quick action.
-
-> **If the tile's `domain` filters on *state* rather than on what the record *is*, give the entry a
-> `history` domain with the state clauses removed.** That is the domain every by-creation-date
-> reading uses. Without it, records leave their own history behind as they progress — which does not
-> merely lose rows, it loses more of them the further back you look, sagging the chart to the left
-> and reporting growth in the trend line on a database where nothing changed.
-
-The preview panel has its own list, `_PREVIEW_SOURCES`, in preference order — the first source that
-is installed, readable and non-empty wins. Module-level constants tune the windows: `SPARK_DAYS`,
-`TREND_WINDOW`, `CHART_WINDOW`, `CHART_SERIES`.
-
-### 9.5 Cards and layout — SCSS
-
-| To restyle | Edit |
-|---|---|
-| Hero, metric, chart, activity, quick-action and preview cards | [`home_dashboard.scss`](static/src/scss/home_dashboard.scss) |
-| The chat bubble and its panel | [`chat_launcher.scss`](static/src/scss/chat_launcher.scss) |
-| Kanban cards and columns | [`kanban.scss`](static/src/scss/kanban.scss) |
-| The app rail | [`apps_sidebar.scss`](static/src/scss/apps_sidebar.scss) |
-| Top navbar | [`navbar.scss`](static/src/scss/navbar.scss) |
-| Control panel / breadcrumbs | [`control_panel.scss`](static/src/scss/control_panel.scss) |
-| Buttons, badges, chips | [`buttons_misc.scss`](static/src/scss/buttons_misc.scss) |
-| Breakpoints and touch/print rules | [`responsive.scss`](static/src/scss/responsive.scss) |
-| The dark scheme for any of the above | [`dark_mode.scss`](static/src/scss/dark_mode.scss) |
-
-### 9.6 OWL components and QWeb templates
-
-| To change | Edit |
-|---|---|
-| Dashboard markup | [`static/src/xml/home_dashboard.xml`](static/src/xml/home_dashboard.xml) |
-| Dashboard behaviour, chart geometry | [`static/src/js/home_dashboard.js`](static/src/js/home_dashboard.js) |
-| Chat panel markup | [`static/src/xml/chat_launcher.xml`](static/src/xml/chat_launcher.xml) |
-| Chat panel behaviour | [`static/src/js/chat_launcher.js`](static/src/js/chat_launcher.js) |
-| Chat server methods, limits | `get_chat_threads` / `get_chat_messages` / `post_chat_message` in [`theme_dashboard.py`](models/theme_dashboard.py) |
-| Sidebar markup + WebClient/NavBar inherits | [`static/src/xml/apps_sidebar.xml`](static/src/xml/apps_sidebar.xml) |
-
-Any new `.js` or `.xml` file must be added to `web.assets_backend` in the manifest **and the service
-restarted** before it loads.
-
-### 9.7 Calendar
-
-There is no calendar component to customise. To restyle Odoo's standard calendar view, edit the
-`.o_calendar_renderer` / `--fc-*` block in [`dark_mode.scss`](static/src/scss/dark_mode.scss) for the
-dark scheme, or the calendar rules in [`brand_bridge.scss`](static/src/scss/brand_bridge.scss) for
-brand colour. See §2.7.
+Frontend bundle (`web.assets_frontend`) gets only four files — `fonts`,
+`variables`, `auth_pages`, `public_home`. `dark_mode.scss` is deliberately
+excluded: it is written against backend DOM that does not exist there, so the
+two auth stylesheets carry their own `:root[data-cmt-theme="dark"]` blocks for
+the surfaces they own.
 
 ---
 
-## 10. Upgrade / Maintenance Notes
+## Customising & extending
 
-### Version compatibility
+### Change a shipped default colour
 
-This module is written against Odoo **19.0** and its version string is `19.0.1.0.0`. Do not install
-it on another major version: the OWL client-action registration, the `/odoo/action-<id>` routing, the
-`has_access` API, the `Home` import path, the FullCalendar v6 selectors and the manifest `assets`
-dict are all 19-specific. Porting to a future version means re-checking each of those.
+Edit `static/src/scss/variables.scss` (light) and/or
+`static/src/scss/dark_mode.scss` (dark), then upgrade the module.
 
-### Asset updates
+⚠️ **The shipped ramp and the derived ramp have to agree.** The multipliers in
+`models/theme_color.py` are fitted to reproduce `variables.scss` when fed
+`#3959b0`. Change a default by hand and it belongs in *both* places, or in
+neither.
 
-- Editing an **existing** SCSS/JS/XML file: clear the ORM cache or run with `--dev=all`; a bundle
-  regeneration is enough.
-- Adding a **new** file to the manifest `assets` dict: **restart the Odoo service.** The manifest is
-  read at load time, so a new entry is invisible until then.
-- After either, hard-refresh the browser — bundles are cached aggressively.
+### Add a new colour picker
 
-### Module upgrade
+Three places, in this order:
 
-`-u bluenova_backend_theme` reloads the `data` XML and regenerates the bundles. Because the module
-owns no stored business model, there is **no migration to write** and no data to convert. Saved
-colours live in `ir.config_parameter` and survive an upgrade untouched; images live in
-`ir.attachment` and do the same.
+1. `static/src/scss/variables.scss` — declare the token under *Settings-driven
+   tokens* (and its dark counterpart in `dark_mode.scss`).
+2. `models/res_config_settings.py` — add the `fields.Char(..., widget="color")`
+   with a `config_parameter`, then map it in `_THEME_CSS_VARS` (and
+   `_THEME_CSS_VARS_DARK` for the dark twin). The map is explicit rather than
+   derived from field names on purpose: the tokens predate the settings screen
+   and do not follow one naming rule, and silently mapping to a token nothing
+   consumes produces a picker that appears to work and changes nothing.
+3. `views/res_config_settings_views.xml` — add the row to the right `<block>`.
 
-### View-inheritance considerations
+Adding it to `_THEME_CSS_VARS` is also what gets it validated, exported, imported
+and reset — `_all_color_fields()` is the single source for all four.
 
-Every template extension is an `xpath` against a core anchor. When Odoo 19 ships a patch release that
-renames one of them, the inherit fails loudly at upgrade time. The anchors currently relied on are:
+### Add an app icon to the sidebar
 
-| File | Anchor |
-|---|---|
-| `apps_sidebar.xml` | `//NavBar` in `web.WebClient`; `//t[@t-call='web.NavBar.AppsMenu']` in `web.NavBar` |
-| `auth_theme.xml` | `web.login_layout` and the auth templates, at priority 30 |
-| `res_config_settings_views.xml` | `res_config_settings.view_general_configuration` |
+Drop a single-colour PNG/SVG in `static/src/image/icons/` and add an entry to
+`ICON_BY_MODULE` in `static/src/js/apps_sidebar.js`, keyed on the **module** part
+of the app's xmlid (`crm.crm_menu_root` → `crm`) — matching on the module rather
+than the displayed name keeps the mapping working in every language.
+`ICON_BY_XMLID` handles the case where one module owns several app roots
+(`base` owns both Apps and Settings); `ICON_BY_NAME_FIRST` exists for the one
+case where only the display name distinguishes two apps (Invoicing vs
+Accounting share `account.menu_finance`).
 
-If a CRM kanban card restyle is ever reinstated, use surgical xpaths rather than replacing
-`<t t-name="card">`: sibling views — notably `crm.crm_lead_view_kanban_forecast` — xpath into that
-card's internals, and a wholesale replace breaks them at install time.
+Apps with no entry fall back to their own Odoo icon, then to `custom.png` — a
+row never borrows another app's artwork, and an icon that fails to decode is
+re-rendered onto the placeholder rather than showing a broken-image glyph.
 
-### Do not modify Odoo core
+### Add a dashboard tile
 
-Every rule in this theme lands through a supported extension point: an appended asset bundle, a
-`t-inherit`, an `xpath`, `patch()` on a prototype, a model `_inherit`, or a controller subclass
-calling `super()`. **Never edit files under `odoo/addons/`** — a core edit is lost on the next
-`git pull` and makes this theme unsupportable.
+Append a spec to `_TILES` in `models/theme_dashboard.py`:
 
-The three-layer strategy the theme uses, in order of preference:
+```python
+{
+    "key": "helpdesk",
+    "model": "helpdesk.ticket",
+    "label": "Tickets",
+    "singular": "ticket",
+    "sub": "Open",
+    "icon": "help desk.png",
+    "domain": [("stage_id.is_close", "=", False)],
+    "history": [],                       # state-free: what the record *is*
+    "action": "helpdesk.helpdesk_ticket_action_main_tree",
+    "pills": [...],                      # optional
+}
+```
 
-1. **Odoo's own custom properties** — `--NavBar-*`, `--Kanban-*` and friends are redefined rather
-   than overridden, so core keeps control of layout and the theme supplies only colour.
-2. **Bootstrap runtime variables** — retargeted at `:root` and component level, in both the
-   unprefixed (`--primary`) and prefixed (`--bs-primary`) spellings, because Odoo's
-   `bootstrap_overridden.scss` sets `$variable-prefix: ''` and emitting one spelling alone is
-   silently inert on half the versions this theme claims to support.
-3. **Direct overrides** — last resort, for surfaces Odoo compiles straight into SCSS literals that no
-   runtime variable can reach.
-
-### Staying compatible with Odoo updates
-
-- Prefer adding a token to `variables.scss` over hardcoding a colour.
-- Prefer a new `_TILES` entry over a new RPC.
-- Keep `mail` / `bus` / `crm` reached by name at runtime rather than imported — an import of an
-  absent module takes down the whole backend bundle, not one feature.
-- Re-run the fit check after touching `theme_color.py`: fed `#3959b0` / `#f8f9fa` it must reproduce
-  `variables.scss`, and fed `#7c9aff` / `#0b1120` it must reproduce `dark_mode.scss`.
-
-### <a name="known-limitations"></a>Known limitations
-
-- Odoo's slide-in app menu on small screens (below `md`) is left as-is.
-- **Graph views stay light on purpose.** Odoo draws chart axis labels onto the canvas from JS, taking
-  the colour from a cookie that Community pins to `"light"` server-side. Darkening the panel would
-  put near-black text on a near-black background, so the chart is given an explicit light card
-  instead.
-- Dark mode covers this theme's surfaces plus the main list / form / kanban / calendar / dialog
-  chrome. Deeper corners — some reports, iframes and third-party widgets — can still show light
-  patches.
-- The chat panel is not a full Discuss client: no attachments, mentions, reactions, message editing,
-  sub-threads or typing indicators. See §2.6.
-- No custom calendar view is provided. See §2.7.
-- The public home page has no drag-and-drop editing; it renders the company's own data plus the
-  Settings tagline. Anything richer is what the `website` module is for, and this theme stands down
-  automatically once `website` is installed.
-- The CRM pipeline stat banner and kanban card restyle are present in the tree but not loaded. See
-  [Dormant code](#dormant-code).
-- No UI screenshots are bundled yet. See §3.
-
-### Uninstall
-
-Apps → BlueNova Backend Theme → Uninstall. The backend returns to stock Odoo immediately. The module
-owns no business models or records — only the transient import wizard, the `ir.config_parameter` rows
-holding the saved palette, and the `ir.attachment` rows holding the uploaded images, all of which go
-with it.
+`history` matters: keep only the clauses saying what *kind* of record this is and
+drop the ones saying what state it is in today, or the sparkline and trend will
+sag to the left on a database where nothing changed.
 
 ---
 
-## 11. Credits
+## Technical reference
 
-**BlueNova Backend Theme**
+### Models
+
+| Name | Type | Purpose |
+|---|---|---|
+| `res.config.settings` | inherit | ~50 colour fields, 4 metrics, 3 flags, 3 images; runtime CSS; export/import/reset |
+| `bluenova.theme.dashboard` | `AbstractModel` | `get_dashboard_data`, `get_chat_threads`, `get_chat_messages`, `post_chat_message` |
+| `bluenova.theme.import.wizard` | `TransientModel` | Validating JSON preset importer (`base.group_system` only) |
+
+### Controller overrides (`web.Home`)
+
+| Method | Behaviour |
+|---|---|
+| `_login_redirect` | Rewrites **only** the default `/odoo` landing to `/odoo/action-<id>` when *Open Dashboard After Login* is on. Runs after 2FA and after the session is established. A missing action logs a warning and falls back rather than opening an "Undefined action" dialog. |
+| `index` | Serves the themed public page at `/` under the four conditions listed above; otherwise `super()`. |
+
+### Config parameters
+
+All keys are prefixed `bluenova_backend_theme.` — e.g. `color_primary`,
+`color_background_dark`, `home_title_size`, `landing_dashboard`,
+`public_home_enabled`, `login_use_brand_image`, `login_tagline`.
+
+### Browser storage
+
+| Key | Values | Meaning |
+|---|---|---|
+| `cmt_color_scheme` | `light` \| `dark` | Colour scheme, per browser |
+| `cmt_apps_sidebar_open` | `true` \| `false` | Sidebar state, per browser (open unless explicitly closed) |
+
+Both reads and writes are wrapped in `try/catch` — private browsing with storage
+disabled falls back to the default and the toggle still applies for that page.
+
+### DOM hooks
+
+| Hook | Where |
+|---|---|
+| `data-cmt-theme="dark"` | `<html>` — the entire dark palette hangs off this one attribute |
+| `body.cmt-has-sidebar` | Both sides of the sidebar layout (the rail is fixed-positioned; restructuring Odoo's `.o_action_manager > .o_action > .o_content { overflow: auto }` scroll chain is what stops views scrolling) |
+| `body.o_bluenova_auth_page` | Login / signup / reset |
+| `body.o_bluenova_public_home` | The public page |
+
+### Tunables
+
+| Constant | Value | File |
+|---|---|---|
+| `SPARK_DAYS` | 7 | `theme_dashboard.py` |
+| `TREND_WINDOW` / `CHART_WINDOW` | 30 / 30 | `theme_dashboard.py` |
+| `CHART_SERIES` | 4 | `theme_dashboard.py` |
+| `CHAT_THREADS` / `CHAT_MESSAGES` / `CHAT_BODY_MAX` | 8 / 30 / 4000 | `theme_dashboard.py` |
+| `COLOR_RE`, `METRIC_BOUNDS` | — | `res_config_settings.py` |
+
+`CHART_WINDOW` is `TREND_WINDOW` deliberately: the chart and the "+12% vs
+previous 30 days" line then describe the same period, so a reader comparing them
+is comparing like with like.
+
+### Responsive breakpoints (`responsive.scss`)
+
+Bootstrap's, so the theme changes shape exactly where core does
+(`ui.isSmall` is `size <= SM`, the same 768px as `d-md-*`):
+
+| Range | Target |
+|---|---|
+| ≥1600 | Wide / ultrawide desktop |
+| ≥1200 | Desktop |
+| 992–1199 | Small desktop, large tablet landscape |
+| 768–991 | Tablet |
+| 576–767 | Large phone |
+| <576 | Phone |
+
+Plus two axes width alone cannot catch: **height** (a phone held landscape is a
+*wide* viewport, so anything eating vertical space stands down under ~500px) and
+**input** (`hover: none` / `pointer: coarse` — a `:hover` style on a touchscreen
+latches after the tap and has to be tapped away, so hover language is re-expressed
+as `:active`).
+
+---
+
+## Uninstalling
+
+**Apps → BlueNova Backend Theme → Uninstall.** Odoo returns to its default look
+immediately. The theme's config parameters and its three attachments are the
+only things it ever wrote — no business record is touched, and nothing needs
+migrating.
+
+---
+
+## License & credits
+
+**Odoo Proprietary License v1.0 (OPL-1)** —
+<https://www.odoo.com/documentation/19.0/legal/licenses.html>.
+OPL-1 rather than LGPL-3 because Odoo requires paid Apps Store modules to carry
+it.
+
+The bundled **Inter** and **Poppins** webfonts remain under the **SIL Open Font
+License 1.1** (see [`static/src/fonts/OFL.txt`](static/src/fonts/OFL.txt)), which
+permits redistribution of the font files inside a proprietary work.
 
 | | |
 |---|---|
-| Author | Strats360 Technolabs-LLP |
-| Company | Strats360 Technolabs-LLP |
-| Maintainer | Strats360 Technolabs-LLP |
-| Website | <https://strats360.com/> |
-| Odoo compatibility | **Odoo 19 Community Edition** |
-| Version | 19.0.1.0.0 |
+| **Author / Maintainer** | Strats360 Technolabs-LLP |
+| **Website** | <https://strats360.com/> |
+| **Support** | <nirav@wewant360.com> — include your Odoo version, the module version and a description of the problem |
 
-**Official Odoo 19 documentation**
-
-- Documentation home — <https://www.odoo.com/documentation/19.0/>
-- Discover the JavaScript framework — <https://www.odoo.com/documentation/19.0/developer/tutorials/discover_js_framework.html>
-- View records reference — <https://www.odoo.com/documentation/19.0/developer/reference/user_interface/view_records.html>
-- Backend development tutorial — <https://www.odoo.com/documentation/19.0/developer/tutorials/backend.html>
-- Dashboards — <https://www.odoo.com/documentation/19.0/applications/productivity/dashboards.html>
-- Calendar — <https://www.odoo.com/documentation/19.0/applications/productivity/calendar.html>
-- Installation — <https://www.odoo.com/documentation/19.0/administration/install.html>
-
-**Bundled third-party assets**
-
-- [Inter](https://rsms.me/inter/) and [Poppins](https://fonts.google.com/specimen/Poppins) — SIL Open
-  Font License 1.1, licence text bundled at [`static/src/fonts/OFL.txt`](static/src/fonts/OFL.txt).
-
----
-
-## 12. License
-
-**OPL-1** — the Odoo Proprietary License v1.0 — as declared in
-[`__manifest__.py`](__manifest__.py) (`'license': 'OPL-1'`) and in [`README.rst`](README.rst).
-
-This is the licence Odoo requires for modules sold on the Apps Store. Full text:
-<https://www.odoo.com/documentation/19.0/legal/licenses.html>
-
-Bundled fonts — Inter and Poppins — are under the
-[SIL Open Font License 1.1](https://openfontlicense.org/), separately from the module's own licence.
+Further reading: [`README.rst`](README.rst) ·
+[`static/description/index.html`](static/description/index.html) (Apps Store
+listing, with screenshots and demo videos).
