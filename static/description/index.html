@@ -379,12 +379,27 @@
     flex: 1 1 260px; min-width: 0;
 }
 .bn-shot__pair { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+/* Grid items stretch, so the two figures in a pair are always the
+   same height — the height of whichever capture is proportionally
+   taller. Without the flex column below, the shorter one keeps its
+   caption directly under its image and dumps the leftover height as
+   dead space *below* the caption, which reads as a broken card. The
+   column pins the caption to the bottom edge and hands the leftover
+   height to the image box instead; `contain` then centres the whole
+   capture in that box, so a light shot that is proportionally wider
+   than its dark twin gains a thin even band top and bottom rather
+   than one lopsided void, and nothing is cropped out of it. */
 .bn-shot__fig {
     margin: 0; border: 1px solid var(--bn-border);
     border-radius: 10px; overflow: hidden;
     background: var(--bn-surface); box-shadow: var(--bn-shadow);
+    display: flex; flex-direction: column;
 }
-.bn-shot__fig img { display: block; width: 100%; height: auto; }
+.bn-shot__fig img {
+    display: block; width: 100%; height: auto;
+    flex: 1 1 auto; min-height: 0;
+    object-fit: contain; object-position: center;
+}
 /* The Theme Settings capture is a full-page shot at 1920x2913. Left
    unconstrained it is taller than the rest of the section put
    together, so it is capped and anchored to the top, where the
