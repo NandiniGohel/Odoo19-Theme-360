@@ -12,6 +12,8 @@ venv/
 .venv/
 env/
 LICENSE
+index.rst
+README.rst
 
 # ===========================
 # VS Code
