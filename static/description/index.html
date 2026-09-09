@@ -396,14 +396,26 @@
     display: flex; flex-direction: column;
 }
 .bn-shot__fig img {
+    background: #d8f3fa;
     display: block; width: 100%; height: auto;
     flex: 1 1 auto; min-height: 0;
     object-fit: contain; object-position: center;
 }
-/* The Theme Settings capture is a full-page shot at 1920x2913. Left
-   unconstrained it is taller than the rest of the section put
-   together, so it is capped and anchored to the top, where the
-   colour pickers are. */
+/* The Theme Settings row is the one pair whose two captures do not
+   share a shape: the light one is a wide annotated graphic (4706x3190,
+   ~1.48) and its dark twin is a full-page shot (1920x2913, ~0.66) —
+   more than twice as tall for its width. Both cards still stretch to
+   the same height, as every pair does; what changes is which way the
+   image sits inside its box.
+     --tall caps the box and pins the image to the *top*, which is right
+   for a capture taller than its slot: the crop that matters is where
+   the colour pickers are. Applied to the wide graphic it did the
+   opposite — the image fell to the top edge and the whole surplus
+   height piled up underneath it as one lopsided void.
+     So the wide graphic is not marked --tall. It keeps the base rule's
+   `contain` + `center`, which fits the capture whole and splits the
+   surplus into an even band above and below. Same card size, image
+   centred in it rather than hung off the top. */
 .bn-shot__fig--tall img { max-height: 640px; object-fit: cover; object-position: top; }
 .bn-shot__cap {
     display: flex; align-items: center; gap: 8px;
@@ -961,15 +973,16 @@
                     </p>
                 </div>
                 <div class="bn-shot__pair">
-                    <figure class="bn-shot__fig">
-                        <img src="screenshots/LightthemeDashboard.png"
-                             alt="BlueNova dashboard in light mode: hero cards, metric cards with sparklines, a 30-day column chart and an activity feed"/>
-                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
-                    </figure>
+                    
                     <figure class="bn-shot__fig">
                         <img src="screenshots/DarkthemeDashboard.png"
                              alt="The same BlueNova dashboard in dark mode"/>
                         <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--dark"></span>Dark mode</figcaption>
+                    </figure>
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/LightthemeDashboard.png"
+                             alt="BlueNova dashboard in light mode: hero cards, metric cards with sparklines, a 30-day column chart and an activity feed"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
                     </figure>
                 </div>
             </div>
@@ -985,15 +998,16 @@
                 </div>
                 <div class="bn-shot__pair">
                     <figure class="bn-shot__fig bn-shot__fig--tall">
-                        <img src="screenshots/LightthemeCustomColorSettings.png"
-                             alt="The Theme Settings page in light mode, showing the light and dark colour picker blocks"/>
-                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
-                    </figure>
-                    <figure class="bn-shot__fig bn-shot__fig--tall">
                         <img src="screenshots/DarkthemeCustomColorSettings.png"
                              alt="The Theme Settings page in dark mode"/>
                         <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--dark"></span>Dark mode</figcaption>
                     </figure>
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/LightthemeCustomColorSettings.png"
+                             alt="The Theme Settings page in light mode, annotated: presets and assets, home page hero typography, authentication page colours, and the light and dark colour picker blocks"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
+                    </figure>
+                    
                 </div>
             </div>
 
@@ -1007,15 +1021,16 @@
                 </div>
                 <div class="bn-shot__pair">
                     <figure class="bn-shot__fig">
-                        <img src="screenshots/LightthemePipeline.png"
-                             alt="A CRM pipeline kanban board in light mode with the BlueNova app rail"/>
-                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
-                    </figure>
-                    <figure class="bn-shot__fig">
                         <img src="screenshots/DarkthemePipeline.png"
                              alt="The same CRM pipeline kanban board in dark mode"/>
                         <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--dark"></span>Dark mode</figcaption>
                     </figure>
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/LightthemePipeline.png"
+                             alt="A CRM pipeline kanban board in light mode with the BlueNova app rail"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
+                    </figure>
+                    
                 </div>
             </div>
 
@@ -1029,15 +1044,16 @@
                 </div>
                 <div class="bn-shot__pair">
                     <figure class="bn-shot__fig">
-                        <img src="screenshots/LightthemeEmployees.png"
-                             alt="The Employees list view in light mode"/>
-                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
-                    </figure>
-                    <figure class="bn-shot__fig">
                         <img src="screenshots/DarkthemeEmployees.png"
                              alt="The Employees list view in dark mode"/>
                         <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--dark"></span>Dark mode</figcaption>
                     </figure>
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/LightthemeEmployees.png"
+                             alt="The Employees list view in light mode"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
+                    </figure>
+                    
                 </div>
             </div>
 
@@ -1051,15 +1067,16 @@
                 </div>
                 <div class="bn-shot__pair">
                     <figure class="bn-shot__fig">
-                        <img src="screenshots/LightthemeAddNew.png"
-                             alt="A record form in light mode, showing the sheet, status bar and notebook"/>
-                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
-                    </figure>
-                    <figure class="bn-shot__fig">
                         <img src="screenshots/DarkthemeAddNew.png"
                              alt="The same record form in dark mode"/>
                         <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--dark"></span>Dark mode</figcaption>
                     </figure>
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/LightthemeAddNew.png"
+                             alt="A record form in light mode, showing the sheet, status bar and notebook"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
+                    </figure>
+                    
                 </div>
             </div>
 
@@ -1073,15 +1090,16 @@
                 </div>
                 <div class="bn-shot__pair">
                     <figure class="bn-shot__fig">
-                        <img src="screenshots/LightthemeLoginWithbg.png"
-                             alt="The themed login page in light mode with a background image"/>
-                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
-                    </figure>
-                    <figure class="bn-shot__fig">
                         <img src="screenshots/DarkthemeLoginWithbg.png"
                              alt="The themed login page in dark mode with a background image"/>
                         <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--dark"></span>Dark mode</figcaption>
                     </figure>
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/LightthemeLoginWithbg.png"
+                             alt="The themed login page in light mode with a background image"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
+                    </figure>
+                    
                 </div>
             </div>
 
@@ -1095,14 +1113,14 @@
                 </div>
                 <div class="bn-shot__pair">
                     <figure class="bn-shot__fig">
-                        <img src="screenshots/LightthemeLoginWithoutbg.png"
-                             alt="The themed login page in light mode without a background image"/>
-                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
-                    </figure>
-                    <figure class="bn-shot__fig">
                         <img src="screenshots/DarkthemeLoginWithoutbg.png"
                              alt="The themed login page in dark mode without a background image"/>
                         <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--dark"></span>Dark mode</figcaption>
+                    </figure>
+                    <figure class="bn-shot__fig">
+                        <img src="screenshots/LightthemeLoginWithoutbg.png"
+                             alt="The themed login page in light mode without a background image"/>
+                        <figcaption class="bn-shot__cap"><span class="bn-scheme bn-scheme--light"></span>Light mode</figcaption>
                     </figure>
                 </div>
             </div>
